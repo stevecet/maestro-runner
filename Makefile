@@ -3,6 +3,9 @@ APK_NAME := smobilpay.apk
 APK_PATH := app/smobilpay.apk	
 APK_URL := https://expo.dev/artifacts/eas/uXov38MZuEoUS2qt1azMHS.apk
 
+pull:
+	docker compose pull
+
 # 0. Check if the app directory exists and download the latest version
 download-apk:
 	@echo "Checking APK directory..."
@@ -23,7 +26,7 @@ download-apk:
 
 
 # 1. Start the containers and wait for it to be ready
-up:
+up: pull
 	docker compose up -d
 
 	@echo "Waiting for containers to initialize..."
@@ -37,6 +40,7 @@ start: up download-apk
 	adb -s localhost:5555 install $(APK_PATH)
 
 # 3. Run the Maestro tests
+# Find all .yaml files inside the tests directory and run them as Maestro tests on the emulator at localhost:5555
 run-tests:
 	find tests -name "*.yaml" -print0 | xargs -0 maestro --device localhost:5555 test
 
