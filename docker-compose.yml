@@ -22,7 +22,7 @@ services:
     shm_size: '4gb'
   maestro-runner:
     build: .
-    image: maestro-runner:latest
+    image: steveceto/maestro-runner:latest
     container_name: maestro-tester
     depends_on:
       android-emulator:
