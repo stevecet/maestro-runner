@@ -33,4 +33,4 @@ services:
       sh -c "adb connect android-emulator:5555 && 
         while [ \"`adb shell getprop sys.boot_completed | tr -d '\r'`\" != \"1\" ]; do echo 'Waiting for device boot...'; sleep 5; done &&
         adb install /app/app/smobilpay.apk &&
-        maestro test tests/login" 
+        find tests -name '*.yaml' | xargs maestro test" 

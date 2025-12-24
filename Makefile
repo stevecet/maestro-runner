@@ -38,7 +38,7 @@ start: up download-apk
 
 # 3. Run the Maestro tests
 run-tests:
-	maestro --device localhost:5555 test tests
+	find tests -name "*.yaml" -print0 | xargs -0 maestro --device localhost:5555 test
 
 # 4. Run tests in Docker
 test-docker:

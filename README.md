@@ -36,6 +36,8 @@ make start
 
 ### 2. Run Tests
 
+You can always access the emulator interface at `http://localhost:6080`.
+
 #### Option A: Run in Docker (Recommended)
 
 Run the tests inside a throwaway container that connects to the emulator.
