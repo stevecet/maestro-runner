@@ -1,0 +1,10 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build artifacts and downloaded APKs
+app/*.apk
+*.apk
+
+# Docker
+.env

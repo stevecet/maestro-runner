@@ -1,0 +1,36 @@
+services:
+  android-emulator:
+    container_name: agent-android-emulator
+    image: budtmo/docker-android:emulator_14.0
+    privileged: true
+    ports:
+      - 6080:6080
+      - 5555:5555
+    environment:
+      DEVICE: "Pixel 7" 
+      WEB_VNC: "true"
+      APPIUM: "false"
+      EMULATOR_TIMEOUT: "900" 
+      RELAXED_SECURITY: "true"
+      # Removed -no-accel if possible; increased stability args
+      EMULATOR_ARGS: "-gpu off -no-snapshot -noaudio -no-boot-anim"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:6080 || exit 1" ]
+      interval: 20s
+      timeout: 10s
+      retries: 30
+    shm_size: '4gb'
+  maestro-runner:
+    build: .
+    image: maestro-runner:latest
+    container_name: maestro-tester
+    depends_on:
+      android-emulator:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: >
+      sh -c "adb connect android-emulator:5555 && 
+        while [ \"`adb shell getprop sys.boot_completed | tr -d '\r'`\" != \"1\" ]; do echo 'Waiting for device boot...'; sleep 5; done &&
+        adb install /app/app/smobilpay.apk &&
+        maestro test tests/login" 

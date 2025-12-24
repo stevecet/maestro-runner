@@ -1,0 +1,21 @@
+# Verify as a Smobilpay Agent, I can add a comment to a ticket successfully
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../login/successful_login.yaml
+---
+- runScript: ../../data/tickets/strings.js
+- tapOn:
+    point: "88%,88%"
+- tapOn:
+    id: "AppMenuItem-ListTickets"
+## Tap on the first ticket
+- tapOn:
+    point: "50%,30%"
+- tapOn:
+    id: "AddCommentTextInput"
+- inputText: ${output.strings.comment}
+- tapOn:
+    id: "SendCommentButton"
+- scroll
+- scroll
+- assertVisible: ${output.strings.comment}  

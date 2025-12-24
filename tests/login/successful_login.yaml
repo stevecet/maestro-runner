@@ -1,0 +1,35 @@
+# Verify that as a valid agent, I can login to the app
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runScript: ../../data/login/user.js
+  - runFlow:
+      file: ../../subflows/auth.yaml
+      env:
+        username: "${output.users.validUser.username}"
+        password: "${output.users.validUser.password}"
+---
+# This part runs AFTER the onFlowStart finishes successfully
+- extendedWaitUntil:
+    visible:
+      id: "android:id/button1"
+    timeout: 200000
+- tapOn:
+    id: "android:id/button1"
+- tapOn:
+    id: "DeviceStatusGrantedButton"
+- tapOn:
+    id: "LoginFormPassword"
+- inputText: ${output.users.validUser.password}
+- back
+- tapOn:
+    id: "LoginFormLogin"
+- extendedWaitUntil:
+    visible: "Welcome to Smobilpay "
+    timeout: 30000
+- scrollUntilVisible:
+    element: "Skip"
+    direction: DOWN
+- tapOn: "Skip"
+- extendedWaitUntil:
+    visible: "Favourite Services"
+    timeout: 200000

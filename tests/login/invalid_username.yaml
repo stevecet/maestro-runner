@@ -1,0 +1,15 @@
+# Verify Failed Login for invalid username
+appId: com.smobilpayagentapp
+---
+- runScript: ../../data/login/user.js
+- runScript: ../../data/login/strings.js
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../../subflows/auth.yaml
+    env:
+      username: "${output.users.wrongUsernameUser.username}"
+      password: "${output.users.wrongUsernameUser.password}"
+- assertVisible: "This user was not found in the system.
+
+    \ [Error Code 303]"

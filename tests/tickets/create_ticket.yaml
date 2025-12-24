@@ -1,0 +1,34 @@
+# Verify as a Smobilpay Agent, I can create a ticket successfully and view its details
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../login/successful_login.yaml
+---
+- runScript: ../../data/tickets/strings.js
+- tapOn:
+    point: "88%,88%"
+- tapOn:
+    id: "AppMenuItem-ListTickets"
+- tapOn:
+    id: "AddTicketButton"
+- tapOn:
+    id: "SubjectTextInput"
+- inputText: ${output.strings.newTicketText}
+- back
+- tapOn:
+    id: "DescriptionTextInput"
+- inputText: ${output.strings.descriptionText}
+- back
+## Bug to be reported, as when you add an attachment the ticket takes infinite time to save even though behind its created
+# - tapOn:
+#     id: "FirstImagePicker"
+# - tapOn:
+#     id: "CameraButton"
+# - tapOn:
+#     id: "com.android.camera2:id/shutter_button"
+# - tapOn:
+#     id: "com.android.camera2:id/done_button"
+- scroll
+- tapOn:
+    id: "SubmitButton"
+- assertVisible: ${output.strings.newTicketText}
+- assertVisible: ${output.strings.descriptionText}

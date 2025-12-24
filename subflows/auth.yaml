@@ -1,0 +1,17 @@
+# subflows/auth.yaml
+appId: com.smobilpayagentapp
+---
+- launchApp:
+    clearState: true
+- tapOn: "Get Started >"
+- tapOn: "Yes, I have an existing account"
+- tapOn:
+    id: "InitialLoginFormUsername"
+- inputText: ${username}
+- back
+- tapOn:
+    id: "InitialLoginFormPassword"
+- inputText: ${password}
+- back
+- tapOn:
+    id: "InitialLoginFormButtonLogin"
