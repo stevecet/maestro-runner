@@ -1,25 +1,31 @@
 services:
   android-emulator:
     container_name: agent-android-emulator
-    image: budtmo/docker-android:emulator_14.0
+    image: budtmo/docker-android:emulator_11.0
     privileged: true
     ports:
       - 6080:6080
       - 5555:5555
     environment:
-      DEVICE: "Pixel 7" 
+      DEVICE: "Samsung Galaxy S10"
       WEB_VNC: "true"
       APPIUM: "false"
-      EMULATOR_TIMEOUT: "900" 
+      EMULATOR_TIMEOUT: "900"
       RELAXED_SECURITY: "true"
-      # Removed -no-accel if possible; increased stability args
-      EMULATOR_ARGS: "-gpu off -no-snapshot -noaudio -no-boot-anim"
+      EMULATOR_ARGS: >
+        -gpu swiftshader_indirect
+        -no-snapshot
+        -noaudio
+        -no-boot-anim
+        -memory 4096
+        -cores 4
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:6080 || exit 1" ]
+      test: [ "CMD-SHELL", "adb shell getprop sys.boot_completed | grep 1" ]
       interval: 20s
       timeout: 10s
       retries: 30
     shm_size: '4gb'
+
   maestro-runner:
     build: .
     image: steveceto/maestro-runner:latest

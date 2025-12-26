@@ -1,0 +1,36 @@
+# Verify as a Smobilpay Agent, I update my KYC
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../login/successful_login.yaml
+---
+- runScript: ../../data/kyc/data.js
+- tapOn:
+    point: "38%,88%"
+- tapOn:
+    id: "AppMenuItem-SuccessScreen"
+- scroll
+- scroll
+- tapOn:
+    id: "update-ekyc"
+- scroll
+- tapOn:
+    id: "KYCStep1-date_of_birth"
+- inputText: ${output.kyc_data.dateOfBirth}
+- tapOn:
+    id: "KYCStep1-id_card_number"
+- inputText: ${output.kyc_data.IdNumber}
+- scroll
+- tapOn:
+    id: "KYCStep1-date_of_issue_id_card"
+- inputText: ${output.kyc_data.dateOfIssue}
+- scroll
+- tapOn:
+    text: "+237"
+    index: 0
+- inputText: ${output.kyc_data.mainPhone}
+- tapOn:
+    text: "+237"
+    index: 1
+- inputText: ${output.kyc_data.whatsappPhone}
+- tapOn:
+    id: "KYCStep1-summit"

@@ -25,10 +25,8 @@ onFlowStart:
     id: "LoginFormLogin"
 - extendedWaitUntil:
     visible: "Welcome to Smobilpay "
-    timeout: 30000
-- scrollUntilVisible:
-    element: "Skip"
-    direction: DOWN
+    timeout: 200000
+- scroll
 - tapOn: "Skip"
 - extendedWaitUntil:
     visible: "Favourite Services"
