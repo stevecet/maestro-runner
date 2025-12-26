@@ -12,9 +12,9 @@ onFlowStart:
 - extendedWaitUntil:
     visible:
       id: "android:id/button1"
-    timeout: 200000
+    timeout: 60000
 - tapOn:
-    id: "android:id/button1"
+    id: "android:id/button1"    
 - tapOn:
     id: "DeviceStatusGrantedButton"
 - tapOn:
@@ -25,7 +25,7 @@ onFlowStart:
     id: "LoginFormLogin"
 - extendedWaitUntil:
     visible: "Welcome to Smobilpay "
-    timeout: 200000
+    timeout: 60000
 - scroll
 - tapOn: "Skip"
 - extendedWaitUntil:

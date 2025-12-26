@@ -1,4 +1,5 @@
 # Verify as a Smobilpay Agent, I update my KYC
+## Need test ids
 appId: com.smobilpayagentapp
 onFlowStart:
   - runFlow: ../login/successful_login.yaml
@@ -12,25 +13,38 @@ onFlowStart:
 - scroll
 - tapOn:
     id: "update-ekyc"
+- extendedWaitUntil:
+    visible: "Setup your KYC"
+    timeout: 60000
 - scroll
+- back
 - tapOn:
     id: "KYCStep1-date_of_birth"
 - inputText: ${output.kyc_data.dateOfBirth}
 - tapOn:
+    point: "88%,50%"
+- tapOn:
+    id: "android:id/button1"
+- back
+- tapOn:
     id: "KYCStep1-id_card_number"
 - inputText: ${output.kyc_data.IdNumber}
+- back
 - scroll
 - tapOn:
     id: "KYCStep1-date_of_issue_id_card"
 - inputText: ${output.kyc_data.dateOfIssue}
+- back
 - scroll
 - tapOn:
     text: "+237"
     index: 0
 - inputText: ${output.kyc_data.mainPhone}
+- back
 - tapOn:
     text: "+237"
     index: 1
 - inputText: ${output.kyc_data.whatsappPhone}
+- back
 - tapOn:
     id: "KYCStep1-summit"

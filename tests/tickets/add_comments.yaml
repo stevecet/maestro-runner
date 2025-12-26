@@ -8,6 +8,10 @@ onFlowStart:
     point: "88%,88%"
 - tapOn:
     id: "AppMenuItem-ListTickets"
+- extendedWaitUntil:
+    visible:
+      point: "50%,30%"
+    timeout: 30000
 ## Tap on the first ticket
 - tapOn:
     point: "50%,30%"
@@ -18,4 +22,4 @@ onFlowStart:
     id: "SendCommentButton"
 - scroll
 - scroll
-- assertVisible: ${output.strings.comment}  
+- assertVisible: ${output.strings.comment}
