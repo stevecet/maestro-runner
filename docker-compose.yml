@@ -1,38 +1,39 @@
 services:
   android-emulator:
     container_name: agent-android-emulator
-    image: budtmo/docker-android:emulator_11.0
+    image: budtmo/docker-android:emulator_11.0 
     privileged: true
     ports:
       - 6080:6080
       - 5555:5555
     environment:
-      DEVICE: "Samsung Galaxy S10"
+      DEVICE: "Pixel 7" 
       WEB_VNC: "true"
       APPIUM: "false"
-      EMULATOR_TIMEOUT: "900"
+      EMULATOR_TIMEOUT: "900" 
       RELAXED_SECURITY: "true"
-      EMULATOR_ARGS: >
-        -gpu swiftshader_indirect
-        -no-snapshot
-        -noaudio
-        -no-boot-anim
-        -memory 4096
-        -cores 4
+      EMULATOR_ARGS: "-gpu off -no-snapshot -noaudio -no-boot-anim"
     healthcheck:
-      test: [ "CMD-SHELL", "adb shell getprop sys.boot_completed | grep 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:6080 || exit 1" ]
       interval: 20s
       timeout: 10s
       retries: 30
     shm_size: '4gb'
-
   maestro-runner:
     build: .
     image: steveceto/maestro-runner:latest
     container_name: maestro-tester
+    command: /app/run_tests.sh
     depends_on:
       android-emulator:
         condition: service_healthy
+      wiremock:
+        condition: service_started
+
+  wiremock:
+    image: wiremock/wiremock:latest
+    container_name: wiremock
+    ports:
+      - "8080:8080"
     volumes:
-      - .:/app
-    command: /app/run_tests.sh
+      - ./wiremock:/home/wiremock

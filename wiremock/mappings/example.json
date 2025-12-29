@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/user/profile"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"id\": \"123\", \"name\": \"Mock User\", \"email\": \"mock@example.com\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
