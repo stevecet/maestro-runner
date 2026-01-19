@@ -31,3 +31,8 @@ onFlowStart:
 - extendedWaitUntil:
     visible: "Favourite Services"
     timeout: 200000
+- runFlow:
+    when:
+      visible: "Important message."
+    commands:
+        - tapOn: 'AppUpdateDialogNotNow'

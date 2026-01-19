@@ -1,0 +1,38 @@
+## Verify as a Smobilpay Agent, I can do a cashin via MTN successfully
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../login/successful_login.yaml
+---
+- runScript: ../../data/cashin/data.js
+- runScript: ../../data/topup/data.js
+- tapOn: "Search"
+- tapOn:
+    id: "icon-button"
+    index: 0
+- tapOn:
+    id: "search-bar"
+- inputText: ${output.topup_data.searchMTNCashin}
+- back
+- tapOn:
+    id: "ServiceItem-MTN MoMo Cash in / DÃ©pÃ´t"
+- tapOn: 
+    id: "AmountFormServiceNumber"
+- inputText: ${output.cashin_data.mtnServiceNumber}
+- tapOn:
+    id: "AmountFormAmount"
+- inputText: ${output.cashin_data.cashinAmount}
+- tapOn:
+    id: "AmountFormSubmit"
+- extendedWaitUntil:
+    visible: ${output.cashin_data.customAmountText}
+    timeout: 10000
+- scroll
+## assert if the amount and the total are equal
+- assertVisible:
+    text: "${output.cashin_data.cashinAmount} XAF"
+    index: 0
+- assertVisible:
+    text: "${output.cashin_data.cashinAmount} XAF"
+    index: 1
+- tapOn:
+    id: "CollectionPreviewConfirmButton"

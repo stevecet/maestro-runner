@@ -3,7 +3,8 @@ appId: com.smobilpayagentapp
 ---
 - launchApp:
     clearState: true
-- tapOn: "Get Started >"
+- tapOn:
+    id: "GetStartedButton"
 - tapOn: "Yes, I have an existing account"
 - tapOn:
     id: "InitialLoginFormUsername"

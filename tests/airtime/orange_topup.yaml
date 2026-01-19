@@ -1,0 +1,40 @@
+# Verify as a Smobilpay Agent, I can do selftopup via Orange successfully
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../login/successful_login.yaml
+---
+- runScript: ../../data/topup/data.js
+- tapOn: "Search"
+- tapOn:
+    id: "icon-button"
+    index: 0
+- tapOn:
+    id: "search-bar"
+- inputText: ${output.topup_data.searchValueOrange}
+- back
+- tapOn:
+    id: "ServiceItem-ORANGE Recharge/Topup"
+- tapOn:
+    id: "AmountFormServiceNumber"
+- inputText: ${output.topup_data.orangeServiceNumber}
+- back
+- tapOn:
+    id: "AmountFormAmount"
+- inputText: ${output.topup_data.topupAmount}
+- back
+- tapOn:
+    id: "AmountFormSubmit"
+- extendedWaitUntil:
+    visible: ${output.topup_data.airtimeCustomAmountText}
+    timeout: 10000
+- scroll
+- assertVisible: "Customer ID"
+- assertVisible: "${output.topup_data.orangeServiceNumber}"
+- assertVisible: "${output.topup_data.amountText}"
+- assertVisible: "${output.topup_data.displayedAmount} XAF"
+- assertVisible: "${output.topup_data.serviceFeeText}"
+- assertVisible: "${output.topup_data.serviceCharge} XAF"
+- assertVisible: "${output.topup_data.totalText}"
+- assertVisible: "${output.topup_data.totalAmount} XAF"
+- tapOn:
+    id: "AccountTopUpPreviewSubmitButton"
