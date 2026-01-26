@@ -21,8 +21,7 @@ up: pull
 down:
 	docker compose down
 
-restart:
-	down start
+restart: down start
 
 # APK
 

@@ -22,7 +22,7 @@ echo "Device is ready."
 echo "Checking APK installation..."
 if ! adb -s $DEVICE shell pm list packages | grep com.smobilpayagentapp; then
     echo "Installing APK..."
-    adb -s $DEVICE install /app/app/smobilpay.apk
+    adb -s $DEVICE install /app/smobilpay.apk
 else
     echo "APK already installed."
 fi
