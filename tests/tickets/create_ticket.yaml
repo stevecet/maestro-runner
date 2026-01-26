@@ -1,7 +1,7 @@
 # Verify as a Smobilpay Agent, I can create a ticket successfully and view its details
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/tickets/strings.js
 - tapOn:
@@ -18,7 +18,7 @@ onFlowStart:
     id: "DescriptionTextInput"
 - inputText: ${output.strings.descriptionText}
 - back
-## Bug to be reported, as when you add an attachment the ticket takes infinite time to save even though behind its created
+## Bug reported, as when you add an attachment the ticket takes infinite time to save even though behind its created
 # - tapOn:
 #     id: "FirstImagePicker"
 # - tapOn:

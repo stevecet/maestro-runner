@@ -2,7 +2,7 @@
 ## Need test ids
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/kyc/data.js
 - tapOn:

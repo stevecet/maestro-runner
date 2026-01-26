@@ -1,0 +1,21 @@
+# subflows/restart_app.yaml
+appId: com.smobilpayagentapp
+---
+- runScript: ../data/login/user.js
+- stopApp: "com.smobilpayagentapp"
+- launchApp: "com.smobilpayagentapp"
+- extendedWaitUntil:
+    visible:
+      id: "android:id/button1"
+    timeout: 60000
+- tapOn:
+    id: "android:id/button1" 
+- tapOn:
+    id: "LoginFormPassword"
+- inputText: ${output.users.validUser.password}
+- back
+- tapOn:
+    id: "LoginFormLogin"
+- extendedWaitUntil:
+    visible: "Favourite Services"
+    timeout: 200000

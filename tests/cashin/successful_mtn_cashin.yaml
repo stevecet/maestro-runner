@@ -1,17 +1,16 @@
 ## Verify as a Smobilpay Agent, I can do a cashin via MTN successfully
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/cashin/data.js
-- runScript: ../../data/topup/data.js
 - tapOn: "Search"
 - tapOn:
     id: "icon-button"
     index: 0
 - tapOn:
     id: "search-bar"
-- inputText: ${output.topup_data.searchMTNCashin}
+- inputText: ${output.cashin_data.searchMTNCashin}
 - back
 - tapOn:
     id: "ServiceItem-MTN MoMo Cash in / DÃ©pÃ´t"
@@ -21,18 +20,24 @@ onFlowStart:
 - tapOn:
     id: "AmountFormAmount"
 - inputText: ${output.cashin_data.cashinAmount}
+- back
 - tapOn:
     id: "AmountFormSubmit"
 - extendedWaitUntil:
-    visible: ${output.cashin_data.customAmountText}
+    visible: ${output.cashin_data.transactionDetails}
     timeout: 10000
 - scroll
 ## assert if the amount and the total are equal
 - assertVisible:
-    text: "${output.cashin_data.cashinAmount} XAF"
+    text: "${output.cashin_data.displayedAmount} XAF"
     index: 0
 - assertVisible:
-    text: "${output.cashin_data.cashinAmount} XAF"
+    text: "${output.cashin_data.mtnTotalAmount} XAF"
     index: 1
 - tapOn:
     id: "CollectionPreviewConfirmButton"
+## assert successful transaction
+- assertVisible: "Collection Details"
+- assertVisible: "Success"
+- assertVisible: "${output.cashin_data.orangeServiceNumber}"
+- assertVisible: "${output.cashin_data.displayedAmount} XAF"

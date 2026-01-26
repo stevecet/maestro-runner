@@ -1,7 +1,7 @@
 ## Verify as a Smobilpay Agent, I can do topup via MTN Recharge successfully
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/topup/data.js
 - tapOn: "Search"
@@ -33,8 +33,19 @@ onFlowStart:
 - assertVisible: "${output.topup_data.amountText}"
 - assertVisible: "${output.topup_data.displayedAmount} XAF"
 - assertVisible: "${output.topup_data.serviceFeeText}"
-- assertVisible: "${output.topup_data.serviceCharge} XAF"
+- assertVisible: "${output.topup_data.mtnServiceCharge} XAF"
 - assertVisible: "${output.topup_data.totalText}"
 - assertVisible: "${output.topup_data.totalAmount} XAF"
 - tapOn:
-    id: "AccountTopUpPreviewSubmitButton"
+    id: "CollectionPreviewConfirmButton"
+## assert successful transaction
+- extendedWaitUntil:
+    visible: "Collection Details"
+    timeout: 20000
+## Assert the transaction details
+- assertVisible: "${output.topup_data.mtnServiceNumber}"
+- assertVisible: "${output.topup_data.displayedAmount} XAF"
+- assertVisible: "${output.topup_data.mtnTotalAmount} XAF"
+- extendedWaitUntil:
+    visible: "Success"
+    timeout: 200000

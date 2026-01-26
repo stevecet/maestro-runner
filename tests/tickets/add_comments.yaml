@@ -1,7 +1,7 @@
 # Verify as a Smobilpay Agent, I can add a comment to a ticket successfully
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/tickets/strings.js
 - tapOn:

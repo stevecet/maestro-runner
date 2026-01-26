@@ -6,16 +6,14 @@ ENV MAESTRO_VERSION=1.39.2
 ENV ANDROID_HOME=/opt/android-sdk
 ENV PATH="${PATH}:/opt/maestro/maestro/bin:${ANDROID_HOME}/platform-tools"
 
-# Install dependencies: curl, unzip, and android-tools (for adb)
+# Install dependencies and Maestro CLI
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     wget \
     android-tools-adb \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Maestro CLI
-RUN mkdir -p /opt/maestro && \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /opt/maestro && \
     wget -q -O /tmp/maestro.zip "https://github.com/mobile-dev-inc/maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip" && \
     unzip -q /tmp/maestro.zip -d /opt/maestro && \
     rm /tmp/maestro.zip

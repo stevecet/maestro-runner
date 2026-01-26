@@ -1,7 +1,7 @@
 ## Verify as a Smobilpay Agent, I can do selftopup via MTN successfully
 appId: com.smobilpayagentapp
 onFlowStart:
-  - runFlow: ../login/successful_login.yaml
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/selftopup/data.js
 - tapOn: "Fund your account"
@@ -27,3 +27,12 @@ onFlowStart:
 - assertVisible: "${output.selftopup_data.totalAmount} XAF"
 - tapOn:
     id: "AccountTopUpPreviewSubmitButton" 
+- extendedWaitUntil:
+    visible: "Collection Details"
+    timeout: 20000
+- assertVisible: "${output.selftopup_data.mtnServiceNumber}"
+- assertVisible: "${output.selftopup_data.displayedAmount} XAF"
+- assertVisible: "${output.selftopup_data.totalAmount} XAF"
+- extendedWaitUntil:
+    visible: "Success"
+    timeout: 30000
