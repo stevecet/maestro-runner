@@ -15,11 +15,20 @@ services:
       RELAXED_SECURITY: "true"
       EMULATOR_ARGS: "-gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
     shm_size: '4gb'
+    healthcheck:
+      test: ["CMD-SHELL", "adb devices | grep -q 'device$'"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
   maestro-runner:
     build: .
     image: steveceto/maestro-runner:latest
     container_name: maestro-tester
     command: /app/run_tests.sh
+    volumes:
+      - .:/app
+      - ./allure-results:/app/allure-results
     depends_on:
       android-emulator:
         condition: service_healthy

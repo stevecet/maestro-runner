@@ -56,7 +56,22 @@ If you have the Maestro CLI installed on your host machine, you can run:
 make run-tests
 ```
 
-### 3. Stop & Cleanup
+### 4. Jenkins Pipeline & Allure Reporting
+
+A `Jenkinsfile` is provided to run tests in a Jenkins pipeline. It uses the `maestro-runner` Docker container and publishes reports using the Allure Jenkins Plugin.
+
+- **Allure Results**: Generated in the `allure-results/` directory as JUnit XML files.
+- **Jenkins Setup**: See [jenkins_allure_setup.md](file:///home/steveceto/.gemini/antigravity/brain/c3afe80b-64bc-4dad-873a-ba36144e5cd9/jenkins_allure_setup.md) for plugin configuration details.
+
+To run tests locally and generate results:
+
+```bash
+make test-docker
+```
+
+The results will be available in the `allure-results/` folder on your host machine.
+
+### 5. Stop & Cleanup
 
 To stop the containers and free up resources:
 

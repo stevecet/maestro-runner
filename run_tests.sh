@@ -22,13 +22,17 @@ echo "Device is ready."
 echo "Checking APK installation..."
 if ! adb -s $DEVICE shell pm list packages | grep com.smobilpayagentapp; then
     echo "Installing APK..."
-    adb -s $DEVICE install /app/smobilpay.apk
+    adb -s $DEVICE install /app/app/smobilpay.apk
 else
     echo "APK already installed."
 fi
 
 # 4. Run tests
 echo "Finding all .yaml tests..."
+# Clear previous allure results
+rm -rf allure-results/*
+mkdir -p allure-results
+
 TEST_FILES=$(find tests -name "*.yaml" -not -path "*/login/*")
 
 EXIT_CODE=0
@@ -37,8 +41,13 @@ for test_file in $TEST_FILES; do
     echo "------------------------------------------------------------"
     echo "Running test: $test_file"
     
-    # Run maestro with a timeout
-    timeout $TEST_TIMEOUT maestro --device $DEVICE test "$test_file"
+    # Clear previous results for this test file if necessary, 
+    # but maestro --format allure --output allure-results usually appends/manages it.
+    # However, to avoid mixing old results from different runs, we might want to clear the whole directory at the start.
+    
+    # Run maestro with a timeout and JUnit reporting (which Allure can consume)
+    test_name=$(basename "$test_file" .yaml)
+    timeout $TEST_TIMEOUT maestro --device $DEVICE test "$test_file" --format junit --output "allure-results/${test_name}.xml"
     RESULT=$?
     
     if [ $RESULT -eq 124 ]; then
