@@ -14,7 +14,13 @@ pipeline {
 
         stage('Prepare Environment') {
             steps {
-                sh 'make download-apk'
+                script {
+                    if (isUnix()) {
+                        sh 'make download-apk'
+                    } else {
+                        bat 'make download-apk'
+                    }
+                }
             }
         }
 
@@ -22,7 +28,11 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'make test-docker'
+                        if (isUnix()) {
+                            sh 'make test-docker'
+                        } else {
+                            bat 'make test-docker'
+                        }
                     } catch (e) {
                         currentBuild.result = 'UNSTABLE'
                     }
@@ -35,8 +45,12 @@ pipeline {
         always {
             script {
                 allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+                if (isUnix()) {
+                    sh 'make down'
+                } else {
+                    bat 'make down'
+                }
             }
-            sh 'make down'
         }
     }
 }
