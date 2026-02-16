@@ -18,11 +18,20 @@ while [ "$(adb -s $DEVICE shell getprop sys.boot_completed | tr -d '\r')" != "1"
 done
 echo "Device is ready."
 
-# 3. Ensure APK is installed
+# 3. Ensure APK is ready
+echo "Checking APK file..."
+APK_PATH="/app/app/smobilpay.apk"
+if [ ! -f "$APK_PATH" ]; then
+    echo "APK not found. Downloading from $APK_URL..."
+    mkdir -p /app/app
+    curl -L -o "$APK_PATH" "$APK_URL"
+    chmod 644 "$APK_PATH"
+fi
+
 echo "Checking APK installation..."
 if ! adb -s $DEVICE shell pm list packages | grep com.smobilpayagentapp; then
     echo "Installing APK..."
-    adb -s $DEVICE install /app/app/smobilpay.apk
+    adb -s $DEVICE install "$APK_PATH"
 else
     echo "APK already installed."
 fi

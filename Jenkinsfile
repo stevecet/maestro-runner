@@ -12,26 +12,14 @@ pipeline {
             }
         }
 
-        stage('Prepare Environment') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'make download-apk'
-                    } else {
-                        bat 'make download-apk'
-                    }
-                }
-            }
-        }
-
         stage('Run Tests') {
             steps {
                 script {
                     try {
                         if (isUnix()) {
-                            sh 'make test-docker'
+                            sh 'docker compose up --build maestro-runner'
                         } else {
-                            bat 'make test-docker'
+                            bat 'docker compose up --build maestro-runner'
                         }
                     } catch (e) {
                         currentBuild.result = 'UNSTABLE'
@@ -46,9 +34,9 @@ pipeline {
             script {
                 allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
                 if (isUnix()) {
-                    sh 'make down'
+                    sh 'docker compose down'
                 } else {
-                    bat 'make down'
+                    bat 'docker compose down'
                 }
             }
         }

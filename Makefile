@@ -47,7 +47,7 @@ run-tests:
 	find tests -name "*.yaml" -print0 | xargs -0 maestro --device localhost:5555 test
 
 # 4. Run tests in Docker
-test-docker: download-apk
+test-docker:
 	docker compose up --build maestro-runner
 
 # 5. Clean up
