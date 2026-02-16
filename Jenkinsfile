@@ -16,11 +16,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        if (isUnix()) {
-                            sh 'docker compose up --build maestro-runner'
-                        } else {
-                            bat 'docker compose up --build maestro-runner'
-                        }
+                        sh 'docker compose up --build maestro-runner'
                     } catch (e) {
                         currentBuild.result = 'UNSTABLE'
                     }
@@ -33,11 +29,7 @@ pipeline {
         always {
             script {
                 allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-                if (isUnix()) {
-                    sh 'docker compose down'
-                } else {
-                    bat 'docker compose down'
-                }
+                sh 'docker compose down'
             }
         }
     }
