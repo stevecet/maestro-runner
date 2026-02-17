@@ -42,7 +42,8 @@ echo "Finding all .yaml tests..."
 rm -rf allure-results/*
 mkdir -p allure-results
 
-TEST_FILES=$(find ${TEST_PATH:-tests} -name "*.yaml" | sort)
+# TEST_FILES=$(find ${TEST_PATH:-tests} -name "*.yaml" | sort)
+TEST_FILES=$(find tests -name "*.yaml" | sort)
 
 EXIT_CODE=0
 
