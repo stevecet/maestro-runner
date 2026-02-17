@@ -29,7 +29,7 @@ download-apk:
 up: pull
 #   Uncomment this if you want to run all the containers
 # 	docker compose up -d
-	docker compose up -d android-emulator wiremock
+	docker compose up -d android-emulator
 
 	@echo "Waiting for containers to initialize..."
 	sleep 90
