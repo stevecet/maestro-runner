@@ -77,5 +77,9 @@ for test_file in $TEST_FILES; do
     fi
 done
 
+# 5. Fix permissions for Jenkins (Allure plugin needs to write to this directory)
+echo "Fixing permissions for Allure results..."
+chmod -R 777 allure-results
+
 echo "Test run finished with code $EXIT_CODE"
 exit $EXIT_CODE
