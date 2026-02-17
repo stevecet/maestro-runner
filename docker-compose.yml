@@ -28,6 +28,7 @@ services:
     command: /app/run_tests.sh
     environment:
       - APK_URL=https://expo.dev/artifacts/eas/9tP2bG2ePDt1fHku7tTgiL.apk
+      - TEST_PATH=${TEST_PATH:-tests}
     volumes:
       - .:/app
       - ./allure-results:/app/allure-results

@@ -38,10 +38,10 @@ onFlowStart:
 - assertVisible: "${output.topup_data.totalAmount} XAF"
 - tapOn:
     id: "CollectionPreviewConfirmButton"
-- tapOn:
-    id: "android:id/button1"
-- tapOn:
-    id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
+# - tapOn:
+#     id: "android:id/button1"
+# - tapOn:
+#     id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
 ## assert successful transaction
 - extendedWaitUntil:
     visible: "Collection Details"
