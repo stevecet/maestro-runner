@@ -1,7 +1,7 @@
 // data/topup/data.js
 const topup_data = {
-  orangeServiceNumber: "699090909",
-  mtnServiceNumber: "678901234",
+  orangeServiceNumber: "658975641",
+  mtnServiceNumber: "650134682",
   topupAmount: "1000",
   displayedAmount: "1,000.00",
   orangeServiceCharge: "0.00",

@@ -14,7 +14,7 @@ onFlowStart:
       id: "android:id/button1"
     timeout: 60000
 - tapOn:
-    id: "android:id/button1"    
+    id: "android:id/button1"
 - tapOn:
     id: "DeviceStatusGrantedButton"
 - tapOn:
