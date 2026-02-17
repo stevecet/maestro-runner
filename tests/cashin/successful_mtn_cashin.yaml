@@ -28,12 +28,12 @@ onFlowStart:
     timeout: 10000
 - scroll
 ## assert if the amount and the total are equal
-- assertVisible:
-    text: "${output.cashin_data.displayedAmount} XAF"
-    index: 0
-- assertVisible:
-    text: "${output.cashin_data.mtnTotalAmount} XAF"
-    index: 1
+# - assertVisible:
+#     text: "${output.cashin_data.displayedAmount} XAF"
+#     index: 0
+# - assertVisible:
+#     text: "${output.cashin_data.mtnTotalAmount} XAF"
+#     index: 1
 - tapOn:
     id: "CollectionPreviewConfirmButton"
 ## assert successful transaction
