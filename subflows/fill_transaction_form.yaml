@@ -1,0 +1,15 @@
+# subflows/fill_transaction_form.yaml
+# Parameters:
+#   serviceNumber: The service number or customer ID
+#   amount: The transaction amount
+
+- tapOn:
+    id: "AmountFormServiceNumber"
+- inputText: ${serviceNumber}
+- back
+- tapOn:
+    id: "AmountFormAmount"
+- inputText: ${amount}
+- back
+- tapOn:
+    id: "AmountFormSubmit"

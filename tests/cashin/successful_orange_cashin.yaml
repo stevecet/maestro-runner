@@ -4,29 +4,22 @@ onFlowStart:
   - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/cashin/data.js
-- tapOn: "Search"
-- tapOn:
-    id: "icon-button"
-    index: 0
-- tapOn:
-    id: "search-bar"
-- inputText: ${output.cashin_data.searchOrangeCashin}
-- back
-- tapOn:
-    id: "ServiceItem-Orange Money Cash in / DEPOT"
-- tapOn:
-    id: "AmountFormServiceNumber"
-- inputText: ${output.cashin_data.orangeServiceNumber}
-- tapOn:
-    id: "AmountFormAmount"
-- inputText: ${output.cashin_data.cashinAmount}
-- back
-- tapOn:
-    id: "AmountFormSubmit"
+- runFlow:
+    file: ../../subflows/search_service.yaml
+    env:
+      searchValue: ${output.cashin_data.searchOrangeCashin}
+      serviceId: "ServiceItem-Orange Money Cash in / DEPOT"
+- runFlow:
+    file: ../../subflows/fill_transaction_form.yaml
+    env:
+      serviceNumber: ${output.cashin_data.orangeServiceNumber}
+      amount: ${output.cashin_data.cashinAmount}
+
 - extendedWaitUntil:
     visible: ${output.cashin_data.transactionDetails}
     timeout: 10000
 - scroll
+
 ## assert if the amount and the total are equal
 - assertVisible:
     text: "${output.cashin_data.displayedAmount} XAF"
@@ -34,10 +27,11 @@ onFlowStart:
 - assertVisible:
     text: "${output.cashin_data.displayedAmount} XAF"
     index: 1
-- tapOn:
-    id: "CollectionPreviewConfirmButton"
-## assert successful transaction
+
+## confirm and verify success
+- runFlow: ../../subflows/confirm_transaction.yaml
+
+## extra verification on success screen
 - assertVisible: "Collection Details"
-- assertVisible: "Success"
 - assertVisible: "${output.cashin_data.orangeServiceNumber}"
 - assertVisible: "${output.cashin_data.displayedAmount} XAF"

@@ -1,0 +1,15 @@
+# subflows/search_service.yaml
+# Parameters:
+#   searchValue: The text to search for
+#   serviceId: The ID of the service item to select (e.g., "ServiceItem-MTN Recharge/Topup")
+
+- tapOn: "Search"
+- tapOn:
+    id: "icon-button"
+    index: 0
+- tapOn:
+    id: "search-bar"
+- inputText: ${searchValue}
+- back
+- tapOn:
+    id: "${serviceId}"

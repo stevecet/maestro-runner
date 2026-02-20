@@ -4,28 +4,20 @@ onFlowStart:
   - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/topup/data.js
-- tapOn: "Search"
-- tapOn:
-    id: "icon-button"
-    index: 0
-- tapOn:
-    id: "search-bar"
-- inputText: ${output.topup_data.searchValueMTN}
-- back
-- tapOn:
-    id: "ServiceItem-MTN Recharge/Topup"
-- tapOn:
-    id: "AmountFormServiceNumber"
-- inputText: ${output.topup_data.mtnServiceNumber}
-- back
-- tapOn:
-    id: "AmountFormAmount"
-- inputText: ${output.topup_data.topupAmount}
-- back
-- tapOn:
-    id: "AmountFormSubmit"
+- runFlow:
+    file: ../../subflows/search_service.yaml
+    env:
+      searchValue: ${output.topup_data.searchValueMTN}
+      serviceId: "ServiceItem-MTN Recharge/Topup"
+- runFlow:
+    file: ../../subflows/fill_transaction_form.yaml
+    env:
+      serviceNumber: ${output.topup_data.mtnServiceNumber}
+      amount: ${output.topup_data.topupAmount}
+
+## verify transaction details before confirming
 - extendedWaitUntil:
-    visible: "Custom Amount"
+    visible: "Payment preview"
     timeout: 10000
 - scroll
 - assertVisible: "Customer ID"
@@ -36,20 +28,12 @@ onFlowStart:
 - assertVisible: "${output.topup_data.mtnServiceCharge} XAF"
 - assertVisible: "${output.topup_data.totalText}"
 - assertVisible: "${output.topup_data.totalAmount} XAF"
-- tapOn:
-    id: "CollectionPreviewConfirmButton"
-# - tapOn:
-#     id: "android:id/button1"
-# - tapOn:
-#     id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
-## assert successful transaction
-- extendedWaitUntil:
-    visible: "Collection Details"
-    timeout: 20000
-## Assert the transaction details
+
+## confirm and verify success
+- runFlow: ../../subflows/confirm_transaction.yaml
+
+## extra verification on success screen
+- assertVisible: "Collection Details"
 - assertVisible: "${output.topup_data.mtnServiceNumber}"
 - assertVisible: "${output.topup_data.displayedAmount} XAF"
 - assertVisible: "${output.topup_data.mtnTotalAmount} XAF"
-- extendedWaitUntil:
-    visible: "Success"
-    timeout: 200000

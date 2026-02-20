@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         ALLURE_RESULTS_PATH = 'allure-results'
-        // TEST_PATH           = 'tests/00_login'
     }
 
     stages {
