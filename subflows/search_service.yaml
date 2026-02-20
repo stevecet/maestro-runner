@@ -2,7 +2,7 @@
 # Parameters:
 #   searchValue: The text to search for
 #   serviceId: The ID of the service item to select (e.g., "ServiceItem-MTN Recharge/Topup")
-
+---
 - tapOn: "Search"
 - tapOn:
     id: "icon-button"
