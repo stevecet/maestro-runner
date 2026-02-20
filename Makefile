@@ -1,7 +1,7 @@
 APK_DIR := app
 APK_NAME := smobilpay.apk
 APK_PATH := app/smobilpay.apk	
-APK_URL := https://expo.dev/artifacts/eas/oPQtVwbVeamqE96bcU1aaB.apk
+APK_URL := https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk
 
 pull:
 	docker compose pull
