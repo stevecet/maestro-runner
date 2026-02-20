@@ -1,0 +1,30 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/login"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": {
+        "status": "success",
+        "token": "mocked-jwt-token",
+        "message": "Login successful"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/transaction/confirm"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": {
+        "status": "success",
+        "transactionId": "MOCK-TX-12345",
+        "message": "Transaction completed successfully"
+      }
+    }
+  }
+]

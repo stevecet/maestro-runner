@@ -41,6 +41,25 @@ echo "Finding all .yaml tests..."
 # Clear previous allure results
 rm -rf allure-results/*
 mkdir -p allure-results
+cat <<EOF > allure-results/environment.properties
+Device=$DEVICE
+AppId=com.smobilpayagentapp
+Environment=Development/WSL
+EOF
+cat <<EOF > allure-results/categories.json
+[
+  {
+    "name": "Maestro Assertions",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*"
+  },
+  {
+    "name": "Timeouts",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*TIMED OUT.*"
+  }
+]
+EOF
 
 # TEST_FILES=$(find ${TEST_PATH:-tests} -name "*.yaml" | sort)
 TEST_FILES=$(find tests -name "*.yaml" | sort)
@@ -57,8 +76,15 @@ for test_file in $TEST_FILES; do
     
     # Run maestro with a timeout and JUnit reporting (which Allure can consume)
     test_name=$(basename "$test_file" .yaml)
-    timeout $TEST_TIMEOUT maestro --device $DEVICE test "$test_file" --format junit --output "allure-results/${test_name}.xml"
+    maestro_xml="allure-results/${test_name}.xml"
+    timeout $TEST_TIMEOUT maestro --device $DEVICE test "$test_file" --format junit --output "$maestro_xml"
     RESULT=$?
+    
+    # Fix XML metadata for Allure (Maestro defaults to "Test Suite")
+    if [ -f "$maestro_xml" ]; then
+        sed -i "s/name=\"Test Suite\"/name=\"$test_name\"/g" "$maestro_xml"
+        sed -i "s/classname=\"Flow\"/classname=\"$test_name\"/g" "$maestro_xml"
+    fi
     
     if [ $RESULT -eq 124 ]; then
         echo "[ERROR] Test $test_file TIMED OUT after ${TEST_TIMEOUT}s"

@@ -34,3 +34,16 @@ services:
     depends_on:
       android-emulator:
         condition: service_healthy
+      mockserver:
+        condition: service_started
+
+  mockserver:
+    image: mockserver/mockserver:latest
+    container_name: mockserver
+    ports:
+      - "1080:1080"
+    environment:
+      MOCKSERVER_LIVENESS_HTTP_GET_PATH: "/mockserver/status"
+    volumes:
+      - ./mockserver:/config
+    command: -proxyPort 1080 -initializationJsonPath /config/initializer.json
