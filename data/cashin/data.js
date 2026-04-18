@@ -1,7 +1,7 @@
 // data/cashin/data.js
 const cashin_data = {
   orangeServiceNumber: "690935868",
-  mtnServiceNumber: "678901234",
+  mtnServiceNumber: "650134682",
   cashinAmount: "1000",
   transactionDetails: "Transaction Details",
   airtimeCustomAmountText: "Airtime Custom Amount",

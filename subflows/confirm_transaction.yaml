@@ -1,8 +1,9 @@
 # subflows/confirm_transaction.yaml
 # Handles the confirmation of a transaction and waits for success result.
+appId: com.smobilpayagentapp
 ---
 - extendedWaitUntil:
-    visible: "Payment preview"
+    visible: "Transaction Details"
     timeout: 10000
 - scroll
 - tapOn:

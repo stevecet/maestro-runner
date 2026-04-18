@@ -5,7 +5,6 @@ appId: com.smobilpayagentapp
     clearState: true
 - tapOn:
     id: "GetStartedButton"
-- tapOn: "Yes, I have an existing account"
 - tapOn:
     id: "InitialLoginFormUsername"
 - inputText: ${username}

@@ -17,7 +17,7 @@ onFlowStart:
 
 ## verify transaction details before confirming
 - extendedWaitUntil:
-    visible: "Payment preview"
+    visible: "Transaction Details"
     timeout: 10000
 - scroll
 - assertVisible: "Customer ID"

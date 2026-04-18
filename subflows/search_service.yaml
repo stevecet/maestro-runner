@@ -2,11 +2,9 @@
 # Parameters:
 #   searchValue: The text to search for
 #   serviceId: The ID of the service item to select (e.g., "ServiceItem-MTN Recharge/Topup")
+appId: com.smobilpayagentapp
 ---
-- tapOn: "Search"
-- tapOn:
-    id: "icon-button"
-    index: 0
+- tapOn: "View all services"
 - tapOn:
     id: "search-bar"
 - inputText: ${searchValue}

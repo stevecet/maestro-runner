@@ -1,0 +1,12 @@
+# Verify I can see the option of adding a second number on self-top up page
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../../subflows/restart_app.yaml
+---
+- tapOn: "Fund your account"
+- extendedWaitUntil:
+    visible: "Enter amount"
+    timeout: 10000
+# TODO: navigate to the self-top numbers management screen if different from this page.
+- assertVisible: "Add a second number"
+

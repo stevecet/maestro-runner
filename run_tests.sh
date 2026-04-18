@@ -1,49 +1,161 @@
 #!/bin/bash
 
-# Configuration
-DEVICE="android-emulator:5555"
-TEST_TIMEOUT=600 # 10 minutes timeout per test file
+set -uo pipefail
+
+DEVICE="${DEVICE:-android-emulator:5555}"
+TEST_TIMEOUT="${TEST_TIMEOUT:-600}"
+APP_PACKAGE="${APP_PACKAGE:-com.smobilpayagentapp}"
+TEST_SUITE="${TEST_SUITE:-regression}"
+TEST_PATH="${TEST_PATH:-}"
+APP_VERSION="${APP_VERSION:-latest}"
+APP_DIR="${APP_DIR:-/app/app}"
+SUITES_DIR="${SUITES_DIR:-/app/config/suites}"
+INSTALL_ONLY="${INSTALL_ONLY:-0}"
+DRY_RUN="${DRY_RUN:-0}"
+
+resolve_app_version() {
+    local apk_path="$1"
+
+    if [ -n "${APP_VERSION}" ] && [ "${APP_VERSION}" != "latest" ]; then
+        echo "${APP_VERSION}"
+        return 0
+    fi
+
+    if [ -f "${APP_DIR}/current.version" ]; then
+        tr -d '[:space:]' < "${APP_DIR}/current.version"
+        return 0
+    fi
+
+    basename "$(dirname "${apk_path}")"
+}
+
+resolve_apk_path() {
+    if [ -n "${APK_PATH:-}" ] && [ -f "${APK_PATH}" ]; then
+        echo "${APK_PATH}"
+        return 0
+    fi
+
+    if [ -n "${APP_VERSION}" ] && [ "${APP_VERSION}" != "latest" ]; then
+        local version_dir="${APP_DIR}/versions/${APP_VERSION}"
+        if [ -d "${version_dir}" ]; then
+            find "${version_dir}" -maxdepth 1 -type f -name "*.apk" | sort | head -n 1
+            return 0
+        fi
+    fi
+
+    local current_version_file="${APP_DIR}/current.version"
+    if [ -f "${current_version_file}" ]; then
+        local current_version
+        current_version="$(tr -d '[:space:]' < "${current_version_file}")"
+        if [ -n "${current_version}" ] && [ -d "${APP_DIR}/versions/${current_version}" ]; then
+            find "${APP_DIR}/versions/${current_version}" -maxdepth 1 -type f -name "*.apk" | sort | head -n 1
+            return 0
+        fi
+    fi
+
+    find "${APP_DIR}/versions" -mindepth 2 -maxdepth 2 -type f -name "*.apk" | sort | tail -n 1
+}
+
+download_apk_if_needed() {
+    local resolved_apk_path="$1"
+    if [ -n "${resolved_apk_path}" ] && [ -f "${resolved_apk_path}" ]; then
+        echo "${resolved_apk_path}"
+        return 0
+    fi
+
+    if [ -z "${APK_URL:-}" ]; then
+        return 1
+    fi
+
+    local target_version="${APP_VERSION}"
+    if [ -z "${target_version}" ] || [ "${target_version}" = "latest" ]; then
+        target_version="$(date +%Y%m%d-%H%M%S)"
+    fi
+
+    local target_dir="${APP_DIR}/versions/${target_version}"
+    local target_file="${target_dir}/smobilpay-${target_version}.apk"
+
+    mkdir -p "${target_dir}"
+    echo "APK not found locally. Downloading ${APK_URL} into ${target_file}..."
+    curl -L -o "${target_file}" "${APK_URL}"
+    chmod 644 "${target_file}"
+    printf '%s\n' "${target_version}" > "${APP_DIR}/current.version"
+
+    echo "${target_file}"
+}
+
+collect_test_files() {
+    local suite_file=""
+
+    if [ -n "${TEST_PATH}" ]; then
+        find "${TEST_PATH}" -type f -name "*.yaml" | sort
+        return 0
+    fi
+
+    suite_file="${SUITES_DIR}/${TEST_SUITE}.txt"
+    if [ -f "${suite_file}" ]; then
+        while IFS= read -r entry; do
+            [ -z "${entry}" ] && continue
+            case "${entry}" in
+                \#*) continue ;;
+            esac
+
+            if [ -d "${entry}" ]; then
+                find "${entry}" -type f -name "*.yaml" | sort
+            elif [ -f "${entry}" ]; then
+                printf '%s\n' "${entry}"
+            else
+                echo "[WARN] Suite entry not found: ${entry}" >&2
+            fi
+        done < "${suite_file}"
+        return 0
+    fi
+
+    find tests -type f -name "*.yaml" | sort
+}
 
 echo "Starting Maestro Test Runner Script..."
+echo "Requested suite: ${TEST_SUITE}"
+echo "Requested app version: ${APP_VERSION}"
 
-# 1. Connect to ADB
-adb connect $DEVICE
+adb connect "${DEVICE}"
 sleep 2
 
-# 2. Wait for device to be ready
 echo "Waiting for device to boot..."
-while [ "$(adb -s $DEVICE shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do
+while [ "$(adb -s "${DEVICE}" shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do
     echo "Device still booting..."
     sleep 5
 done
 echo "Device is ready."
 
-# 3. Ensure APK is ready
-echo "Checking APK file..."
-APK_PATH="/app/app/smobilpay.apk"
-if [ ! -f "$APK_PATH" ]; then
-    echo "APK not found. Downloading from $APK_URL..."
-    mkdir -p /app/app
-    curl -L -o "$APK_PATH" "$APK_URL"
-    chmod 644 "$APK_PATH"
+mkdir -p "${APP_DIR}/versions" allure-results junit-results
+
+APK_PATH="$(resolve_apk_path)"
+if ! APK_PATH="$(download_apk_if_needed "${APK_PATH}")"; then
+    echo "[ERROR] No APK found for APP_VERSION=${APP_VERSION}, and APK_URL was not provided."
+    exit 1
+fi
+APP_VERSION="$(resolve_app_version "${APK_PATH}")"
+
+echo "Using APK: ${APK_PATH}"
+echo "Resolved app version: ${APP_VERSION}"
+
+echo "Installing selected APK..."
+adb -s "${DEVICE}" uninstall "${APP_PACKAGE}" >/dev/null 2>&1 || true
+adb -s "${DEVICE}" install -r "${APK_PATH}"
+
+if [ "${INSTALL_ONLY}" = "1" ]; then
+    echo "Install-only mode enabled. Skipping test execution."
+    exit 0
 fi
 
-echo "Checking APK installation..."
-if ! adb -s $DEVICE shell pm list packages | grep com.smobilpayagentapp; then
-    echo "Installing APK..."
-    adb -s $DEVICE install "$APK_PATH"
-else
-    echo "APK already installed."
-fi
-
-# 4. Run tests
-echo "Finding all .yaml tests..."
-# Clear previous allure results
-rm -rf allure-results/*
-mkdir -p allure-results
+rm -rf allure-results/* junit-results/*
+mkdir -p allure-results junit-results
 cat <<EOF > allure-results/environment.properties
-Device=$DEVICE
-AppId=com.smobilpayagentapp
+Device=${DEVICE}
+AppId=${APP_PACKAGE}
+Suite=${TEST_SUITE}
+AppVersion=${APP_VERSION}
 Environment=Development/WSL
 EOF
 cat <<EOF > allure-results/categories.json
@@ -61,52 +173,63 @@ cat <<EOF > allure-results/categories.json
 ]
 EOF
 
-# TEST_FILES=$(find ${TEST_PATH:-tests} -name "*.yaml" | sort)
-TEST_FILES=$(find tests -name "*.yaml" | sort)
+mapfile -t TEST_FILES < <(collect_test_files | awk 'NF' | sort -u)
+
+if [ "${#TEST_FILES[@]}" -eq 0 ]; then
+    echo "[ERROR] No tests found for suite '${TEST_SUITE}'."
+    exit 1
+fi
+
+echo "Resolved ${#TEST_FILES[@]} test file(s)."
+
+if [ "${DRY_RUN}" = "1" ]; then
+    printf '%s\n' "${TEST_FILES[@]}"
+    echo "Dry-run mode enabled. Skipping Maestro execution."
+    exit 0
+fi
 
 EXIT_CODE=0
 
-for test_file in $TEST_FILES; do
+for test_file in "${TEST_FILES[@]}"; do
     echo "------------------------------------------------------------"
-    echo "Running test: $test_file"
-    
-    # Clear previous results for this test file if necessary, 
-    # but maestro --format allure --output allure-results usually appends/manages it.
-    # However, to avoid mixing old results from different runs, we might want to clear the whole directory at the start.
-    
-    # Run maestro with a timeout and JUnit reporting (which Allure can consume)
-    test_name=$(basename "$test_file" .yaml)
-    maestro_xml="allure-results/${test_name}.xml"
-    timeout $TEST_TIMEOUT maestro --device $DEVICE test "$test_file" --format junit --output "$maestro_xml"
+    echo "Running test: ${test_file}"
+
+    test_name="$(basename "${test_file}" .yaml)"
+    junit_xml="junit-results/${test_name}.xml"
+    timeout "${TEST_TIMEOUT}" maestro --device "${DEVICE}" test "${test_file}" --format junit --output "${junit_xml}"
     RESULT=$?
-    
-    # Fix XML metadata for Allure (Maestro defaults to "Test Suite")
-    if [ -f "$maestro_xml" ]; then
-        sed -i "s/name=\"Test Suite\"/name=\"$test_name\"/g" "$maestro_xml"
-        sed -i "s/classname=\"Flow\"/classname=\"$test_name\"/g" "$maestro_xml"
+
+    if [ -f "${junit_xml}" ]; then
+        sed -i "s/name=\"Test Suite\"/name=\"${test_name}\"/g" "${junit_xml}"
+        sed -i "s/classname=\"Flow\"/classname=\"${test_name}\"/g" "${junit_xml}"
     fi
-    
-    if [ $RESULT -eq 124 ]; then
-        echo "[ERROR] Test $test_file TIMED OUT after ${TEST_TIMEOUT}s"
+
+    if [ "${RESULT}" -eq 124 ]; then
+        echo "[ERROR] Test ${test_file} TIMED OUT after ${TEST_TIMEOUT}s"
         EXIT_CODE=1
-    elif [ $RESULT -ne 0 ]; then
-        echo "[ERROR] Test $test_file FAILED with exit code $RESULT"
+    elif [ "${RESULT}" -ne 0 ]; then
+        echo "[ERROR] Test ${test_file} FAILED with exit code ${RESULT}"
         EXIT_CODE=1
-        
-        # Check if device went offline
-        if ! adb -s $DEVICE shell getprop sys.boot_completed >/dev/null 2>&1; then
+
+        if ! adb -s "${DEVICE}" shell getprop sys.boot_completed >/dev/null 2>&1; then
             echo "[CRITICAL] Device went offline. Attempting to reconnect..."
-            adb connect $DEVICE
+            adb connect "${DEVICE}"
             sleep 5
         fi
     else
-        echo "[SUCCESS] Test $test_file PASSED"
+        echo "[SUCCESS] Test ${test_file} PASSED"
     fi
 done
 
-# 5. Fix permissions for Jenkins (Allure plugin needs to write to this directory)
-echo "Fixing permissions for Allure results..."
-chmod -R 777 allure-results
+echo "Converting JUnit XML to Allure results..."
+if [ -x "./scripts/junit_to_allure.sh" ]; then
+    ./scripts/junit_to_allure.sh junit-results allure-results || true
+else
+    echo "[WARN] Missing converter script ./scripts/junit_to_allure.sh; Allure results will not be generated." >&2
+fi
 
-echo "Test run finished with code $EXIT_CODE"
-exit $EXIT_CODE
+echo "Fixing permissions for Allure results..."
+chmod -R 777 allure-results junit-results
+
+echo "Test run finished with code ${EXIT_CODE}"
+exit "${EXIT_CODE}"

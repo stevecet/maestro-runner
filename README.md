@@ -1,80 +1,107 @@
 # Maestro Mobile Tests
 
-This project provides a Dockerized environment for running mobile UI automation tests using [Maestro](https://maestro.mobile.dev/). It includes an Android emulator and a test runner.
+This project provides a Dockerized Maestro setup for Android UI automation with a structure that separates:
 
-## Prerequisites
+- test cases in `tests/`
+- reusable flows in `subflows/`
+- test data in `data/`
+- suite definitions in `config/suites/`
+- versioned APKs in `app/versions/`
 
-Before running the project, ensure you have the following installed on your machine:
+## Recommended Structure
 
-- **Docker** & **Docker Compose**: To run the emulator and tests in containers.
-- **Make**: To use the simplified commands.
-- **ADB (Android Debug Bridge)**: To connect to the emulator and install the APK (`sudo apt-get install android-tools-adb` on Linux).
-- **Curl**: To download the test APK.
-
-## Configuration
-
-Test credentials and other data are located in the `data/` directory.
-
-- **User Credentials**: Edit `data/login/user.js` to update test user credentials.
-
-## Getting Started
-
-### 1. Start the Environment & Install App
-
-Use the following command to start the Android Emulator, download the test APK, and install it onto the emulator.
-
-```bash
-make start
+```text
+.
+|-- app/
+|   |-- current.version
+|   `-- versions/
+|       `-- 1.14.0/
+|           `-- smobilpay-1.14.0.apk
+|-- config/
+|   `-- suites/
+|       |-- smoke.txt
+|       |-- login.txt
+|       |-- payments.txt
+|       `-- regression.txt
+|-- data/
+|-- subflows/
+`-- tests/
 ```
 
-- **What this does**:
-  - Starts the `android-emulator` container.
-  - Waits for the emulator to be ready.
-  - Downloads the target APK (`smobilpay.apk`) to the `app/` directory (if not already present).
-  - Connects your local `adb` to the containerized emulator.
-  - Installs the APK.
+The suite files list folders or individual test files. This lets us group cases into smoke, regression, payments, or any future business suite without moving your current Maestro flows.
 
-### 2. Run Tests
+## App Versioning
 
-You can always access the emulator interface at `http://localhost:6080`.
+Instead of replacing `app/smobilpay.apk` every time, APKs are now stored by version:
 
-#### Option A: Run in Docker (Recommended)
+```bash
+make download-apk APP_VERSION=1.14.0 APK_URL=https://your-link/app.apk
+make list-apps
+```
 
-Run the tests inside a throwaway container that connects to the emulator.
+That creates:
+
+```text
+app/versions/1.14.0/smobilpay-1.14.0.apk
+```
+
+The selected version is tracked in `app/current.version`, so regression on an older build becomes easier.
+
+## Running Tests
+
+Start the emulator:
+
+```bash
+make up
+```
+
+Run the default regression suite in Docker:
 
 ```bash
 make test-docker
 ```
 
-- This builds the `maestro-runner` image and executes the tests defined in `tests/`.
-
-#### Option B: Run Locally
-
-If you have the Maestro CLI installed on your host machine, you can run:
+Run a specific suite:
 
 ```bash
-make run-tests
+make test-docker TEST_SUITE=smoke APP_VERSION=1.14.0
 ```
 
-### 4. Jenkins Pipeline & Allure Reporting
-
-A `Jenkinsfile` is provided to run tests in a Jenkins pipeline. It uses the `maestro-runner` Docker container and publishes reports using the Allure Jenkins Plugin.
-
-- **Allure Results**: Generated in the `allure-results/` directory as JUnit XML files.
-- **Jenkins Setup**: See [jenkins_allure_setup.md](file:///home/steveceto/.gemini/antigravity/brain/c3afe80b-64bc-4dad-873a-ba36144e5cd9/jenkins_allure_setup.md) for plugin configuration details.
-
-To run tests locally and generate results:
+Run a specific folder or a single test file:
 
 ```bash
-make test-docker
+make test-docker TEST_PATH=tests/cashin
+make test-docker TEST_PATH=tests/00_login/successful_login.yaml
 ```
 
-The results will be available in the `allure-results/` folder on your host machine.
+## Reporting (JUnit + Allure)
 
-### 5. Stop & Cleanup
+- JUnit XML is written to `junit-results/` (published by Jenkins via the `junit` step).
+- Allure raw results are written to `allure-results/` by converting the JUnit XML into minimal Allure `*-result.json` files, so the Jenkins Allure plugin can render a report.
 
-To stop the containers and free up resources:
+## Jenkins
+
+The pipeline now accepts:
+
+- `APP_VERSION`
+- `TEST_SUITE`
+- `TEST_PATH`
+- `APK_URL`
+
+This means Jenkins can run smoke on the latest app, or regression on a stored historical version, without changing files in the repository.
+
+## Team Guidance
+
+For future growth, keep using this convention:
+
+- put executable Maestro cases under `tests/<domain>/`
+- keep reusable sequences in `subflows/`
+- keep static or generated test data in `data/`
+- define business-friendly groupings in `config/suites/*.txt`
+- store APKs by version under `app/versions/<version>/`
+
+## Cleanup
 
 ```bash
-make stop
+make down
 ```

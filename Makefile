@@ -1,55 +1,54 @@
-APK_DIR := app
-APK_NAME := smobilpay.apk
-APK_PATH := app/smobilpay.apk	
-APK_URL := https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk
+APK_ROOT := app
+APK_VERSIONS_DIR := $(APK_ROOT)/versions
+APP_VERSION ?= latest
+APK_URL ?= https://expo.dev/artifacts/eas/czMwkPWpEviGGfVSv9XCka.apk
+TEST_SUITE ?= regression
+TEST_PATH ?=
+DEVICE ?= localhost:5555
 
 pull:
 	docker compose pull
 
-# 0. Check if the app directory exists and download the latest version
 download-apk:
-	@echo "Checking APK directory..."
-	if [ ! -d "$(APK_DIR)" ]; then \
-		echo "Creating $(APK_DIR) directory"; \
-		mkdir -p "$(APK_DIR)"; \
-	else \
-		echo "$(APK_DIR) folder already exists"; \
-	fi
+	@VERSION="$(APP_VERSION)"; \
+	if [ "$$VERSION" = "latest" ]; then VERSION="$$(date +%Y%m%d-%H%M%S)"; fi; \
+	TARGET_DIR="$(APK_VERSIONS_DIR)/$$VERSION"; \
+	TARGET_FILE="$$TARGET_DIR/smobilpay-$$VERSION.apk"; \
+	echo "Preparing versioned APK folder $$TARGET_DIR"; \
+	mkdir -p "$$TARGET_DIR"; \
+	echo "Downloading APK for version $$VERSION"; \
+	curl -L -o "$$TARGET_FILE" "$(APK_URL)"; \
+	chmod 644 "$$TARGET_FILE"; \
+	printf '%s\n' "$$VERSION" > "$(APK_ROOT)/current.version"; \
+	echo "APK stored at $$TARGET_FILE"
 
-	@echo "⬇Downloading latest APK..."
-	curl -L -o "$(APK_DIR)/$(APK_NAME)" "$(APK_URL)"
+list-apps:
+	@echo "Available app versions:"; \
+	if [ -d "$(APK_VERSIONS_DIR)" ]; then find "$(APK_VERSIONS_DIR)" -mindepth 1 -maxdepth 1 -type d | sort; else echo "No versioned APKs stored yet."; fi; \
+	if [ -f "$(APK_ROOT)/current.version" ]; then echo "Current version: $$(cat $(APK_ROOT)/current.version)"; fi
 
-	@echo "Setting permissions..."
-	chmod 644 "$(APK_DIR)/$(APK_NAME)"
-
-	@echo "APK is ready at $(APK_DIR)/$(APK_NAME)"
-
-
-# 1. Start the containers and wait for it to be ready
 up: pull
-#   Uncomment this if you want to run all the containers
-# 	docker compose up -d
 	docker compose up -d android-emulator
-
 	@echo "Waiting for containers to initialize..."
 	sleep 90
-
 	docker compose ps
 
-# 2. Install the APK into the running emulator container
-start: up download-apk
-	adb connect localhost:5555
-	adb -s localhost:5555 install $(APK_PATH)
+start: up
+	adb connect $(DEVICE)
+	APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" DEVICE=$(DEVICE) INSTALL_ONLY=1 docker compose run --rm maestro-runner
 
-# 3. Run the Maestro tests
-# Find all .yaml files inside the tests directory and run them as Maestro tests on the emulator at localhost:5555
+install-app:
+	adb connect $(DEVICE)
+	APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" DEVICE=$(DEVICE) INSTALL_ONLY=1 docker compose run --rm maestro-runner
+
 run-tests:
-	find tests -name "*.yaml" -print0 | xargs -0 maestro --device localhost:5555 test
+	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" maestro --device $(DEVICE) test $${TEST_PATH:-tests}
 
-# 4. Run tests in Docker
 test-docker:
-	docker compose up --build maestro-runner
+	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" docker compose up --build maestro-runner
 
-# 5. Clean up
+dry-run:
+	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" DRY_RUN=1 docker compose run --rm maestro-runner
+
 down:
 	docker compose down

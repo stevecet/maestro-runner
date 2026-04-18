@@ -4,6 +4,7 @@ Thumbs.db
 
 # Build artifacts and downloaded APKs
 app/*.apk
+app/versions/**/*.apk
 *.apk
 
 # Docker
@@ -11,3 +12,6 @@ app/*.apk
 
 # Allure
 allure-results/
+
+# JUnit XML (Maestro output)
+junit-results/

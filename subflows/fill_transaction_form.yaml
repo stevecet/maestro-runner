@@ -2,6 +2,7 @@
 # Parameters:
 #   serviceNumber: The service number or customer ID
 #   amount: The transaction amount
+appId: com.smobilpayagentapp
 ---
 - tapOn:
     id: "AmountFormServiceNumber"

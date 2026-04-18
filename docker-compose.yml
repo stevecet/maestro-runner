@@ -27,7 +27,11 @@ services:
     container_name: maestro-tester
     command: /app/run_tests.sh
     environment:
-      - APK_URL=https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk
+      - APK_URL=${APK_URL:-https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk}
+      - APP_VERSION=${APP_VERSION:-latest}
+      - TEST_SUITE=${TEST_SUITE:-regression}
+      - TEST_PATH=${TEST_PATH:-}
+      - APP_PACKAGE=${APP_PACKAGE:-com.smobilpayagentapp}
     volumes:
       - .:/app
       - ./allure-results:/app/allure-results

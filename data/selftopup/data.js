@@ -1,7 +1,7 @@
 // data/selftopup/data.js
 const selftopup_data = {
   orangeServiceNumber: "697123000",
-  mtnServiceNumber: "677389120",
+  mtnServiceNumber: "650134682",
   topupAmount: "1000",
   displayedAmount: "1,000.00",
   serviceCharge: "5.00",

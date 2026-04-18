@@ -1,0 +1,8 @@
+# Verify I can view both topup options on Method Selection screen
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../../subflows/restart_app.yaml
+---
+- tapOn: "Top-up my account"
+- assertVisible: "Self top-up"
+- assertVisible: "Request top-up"

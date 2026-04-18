@@ -1,0 +1,2 @@
+tests/00_login
+tests/airtime
