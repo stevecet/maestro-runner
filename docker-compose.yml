@@ -26,6 +26,7 @@ services:
     image: steveceto/maestro-runner:latest
     container_name: maestro-tester
     command: /app/run_tests.sh
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     environment:
       - APK_URL=${APK_URL:-https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk}
       - APP_VERSION=${APP_VERSION:-latest}
@@ -33,8 +34,10 @@ services:
       - TEST_PATH=${TEST_PATH:-}
       - APP_PACKAGE=${APP_PACKAGE:-com.smobilpayagentapp}
     volumes:
-      - .:/app
+      - .:/app:ro
+      - ./app:/app/app
       - ./allure-results:/app/allure-results
+      - ./junit-results:/app/junit-results
     depends_on:
       android-emulator:
         condition: service_healthy

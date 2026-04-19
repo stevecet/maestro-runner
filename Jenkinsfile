@@ -13,6 +13,31 @@ pipeline {
     }
 
     stages {
+        stage('Workspace Permissions') {
+            steps {
+                script {
+                    // Previous docker runs can leave root-owned artifacts in the workspace (e.g. app/current.version),
+                    // which can break subsequent `checkout scm`.
+                    def uid = sh(script: 'id -u', returnStdout: true).trim()
+                    def gid = sh(script: 'id -g', returnStdout: true).trim()
+
+                    // Use a tiny container as root to fix ownership in the mounted workspace.
+                    // Keep this resilient: if docker is unavailable, checkout will likely fail anyway.
+                    sh(
+                        script: """
+                          set +e
+                          docker run --rm -v "\$PWD":/ws alpine:3.19 sh -lc '
+                            mkdir -p /ws/app /ws/allure-results /ws/junit-results
+                            chown -R ${uid}:${gid} /ws/app /ws/allure-results /ws/junit-results || true
+                            chmod -R u+rwX /ws/app /ws/allure-results /ws/junit-results || true
+                          '
+                        """,
+                        returnStatus: true
+                    )
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -22,11 +47,15 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
+                    def uid = sh(script: 'id -u', returnStdout: true).trim()
+                    def gid = sh(script: 'id -g', returnStdout: true).trim()
                     def runnerEnv = [
                         "APP_VERSION=${params.APP_VERSION}",
                         "TEST_SUITE=${params.TEST_SUITE}",
                         "TEST_PATH=${params.TEST_PATH}",
-                        "APK_URL=${params.APK_URL}"
+                        "APK_URL=${params.APK_URL}",
+                        "DOCKER_UID=${uid}",
+                        "DOCKER_GID=${gid}"
                     ].join(' ')
 
                     // Use returnStatus: true to handle test failures without aborting the pipeline

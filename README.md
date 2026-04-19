@@ -91,6 +91,12 @@ make test-docker TEST_PATH=tests/00_login/successful_login.yaml
 - JUnit XML is written to `junit-results/` (published by Jenkins via the `junit` step).
 - Allure raw results are written to `allure-results/` by converting the JUnit XML into minimal Allure `*-result.json` files, so the Jenkins Allure plugin can render a report.
 
+## Jenkins Workspace Permissions
+
+If Jenkins fails during `checkout scm` with errors like `Permission denied` for `app/current.version` or `app/versions`, it usually means a previous Docker run wrote root-owned files into the workspace.
+
+This repo configures the `maestro-runner` container to run as the Jenkins agent user (`DOCKER_UID/DOCKER_GID`) and mounts the repository read-only to prevent future permission drift.
+
 ## Jenkins
 
 The pipeline now accepts:
