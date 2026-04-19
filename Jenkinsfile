@@ -5,6 +5,12 @@ pipeline {
         ALLURE_RESULTS_PATH = 'allure-results'
     }
 
+    options {
+        // Prevent Jenkins from doing the implicit "Declarative: Checkout SCM" before our stages.
+        // This lets us fix workspace permissions first when previous Docker runs left root-owned files behind.
+        skipDefaultCheckout(true)
+    }
+
     parameters {
         string(name: 'APP_VERSION', defaultValue: 'latest', description: 'APK version folder from app/versions to install before tests')
         choice(name: 'TEST_SUITE', choices: ['smoke', 'login', 'payments', 'selftopup', 'regression'], description: 'Suite manifest to execute')
