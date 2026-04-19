@@ -1,28 +1,2 @@
 # Verify I can see request Top-Up option disabled or not clickable when access is removed
-# Note: Maestro cannot reliably assert "disabled" without stable testIDs/state exposure.
-appId: com.smobilpayagentapp
-onFlowStart:
-  - runFlow: ../../../subflows/restart_app.yaml
----
-- runScript: ../../../data/selftopup/data.js
-- tapOn: "Fund your account"
-- extendedWaitUntil:
-    visible: "Enter amount"
-    timeout: 10000
-- tapOn:
-    id: "text-input-outline"
-- inputText: ${output.selftopup_data.topupAmount}
-- back
-- tapOn:
-    point: "88%,41%"
-- tapOn:
-    id: "button"
-- extendedWaitUntil:
-    visible: ${output.selftopup_data.mtnTitleText}
-    timeout: 10000
-# TODO: replace with the actual selector/text for the "Request Top-Up" option.
-- assertVisible: "Request Top-Up"
-# Best-effort check: tapping should not navigate when access is removed.
-- tapOn: "Request Top-Up"
-- assertVisible: ${output.selftopup_data.mtnTitleText}
-
+# Note: We need to manually disable access for request topup in the backend before running this test

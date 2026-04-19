@@ -3,7 +3,7 @@ appId: com.smobilpayagentapp
 onFlowStart:
   - runFlow: ../../subflows/restart_app.yaml
 ---
-- runScript: ../../data/tickets/strings.js
+- runScript: ../../data/tickets_data.js
 - tapOn:
     point: "88%,88%"
 - tapOn:

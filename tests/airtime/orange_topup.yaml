@@ -1,31 +1,23 @@
-# Verify as a Smobilpay Agent, I can do selftopup via Orange successfully
+## Verify as a Smobilpay Agent, I can do topup via ORANGE Recharge successfully
 appId: com.smobilpayagentapp
 onFlowStart:
   - runFlow: ../../subflows/restart_app.yaml
 ---
-- runScript: ../../data/topup/data.js
-- tapOn: "Search"
-- tapOn:
-    id: "icon-button"
-    index: 0
-- tapOn:
-    id: "search-bar"
-- inputText: ${output.topup_data.searchValueOrange}
-- back
-- tapOn:
-    id: "ServiceItem-ORANGE Recharge/Topup"
-- tapOn:
-    id: "AmountFormServiceNumber"
-- inputText: ${output.topup_data.orangeServiceNumber}
-- back
-- tapOn:
-    id: "AmountFormAmount"
-- inputText: ${output.topup_data.topupAmount}
-- back
-- tapOn:
-    id: "AmountFormSubmit"
+- runScript: ../../data/airtime_data.js
+- runFlow:
+    file: ../../subflows/search_service.yaml
+    env:
+      searchValue: ${output.topup_data.searchValueOrange}
+      serviceId: "ServiceItem-ORANGE Recharge/Topup"
+- runFlow:
+    file: ../../subflows/fill_transaction_form.yaml
+    env:
+      serviceNumber: ${output.topup_data.orangeServiceNumber}
+      amount: ${output.topup_data.topupAmount}
+
+## verify transaction details before confirming
 - extendedWaitUntil:
-    visible: ${output.topup_data.airtimeCustomAmountText}
+    visible: "Transaction Details"
     timeout: 10000
 - scroll
 - assertVisible: "Customer ID"
@@ -47,4 +39,3 @@ onFlowStart:
 - extendedWaitUntil:
     visible: "Success"
     timeout: 30000
-

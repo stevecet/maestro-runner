@@ -15,3 +15,5 @@ appId: com.smobilpayagentapp
 - back
 - tapOn:
     id: "InitialLoginFormButtonLogin"
+    point: "10%,50%"
+    retryTapIfNoChange: true

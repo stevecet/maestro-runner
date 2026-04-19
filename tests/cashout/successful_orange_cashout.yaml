@@ -1,0 +1,36 @@
+## Verify as a Smobilpay Agent, I can do a cashout via Orange successfully
+appId: com.smobilpayagentapp
+# onFlowStart:
+#   - runFlow: ../../subflows/restart_app.yaml
+---
+- runScript: ../../data/cashout_data.js
+- runFlow:
+    file: ../../subflows/search_service.yaml
+    env:
+      searchValue: ${output.cashout_data.searchOrangeCashout}
+      serviceId: "ServiceItem-Orange Money Cash - Out from Cash Collection"
+- runFlow:
+    file: ../../subflows/fill_transaction_form.yaml
+    env:
+      serviceNumber: ${output.cashout_data.orangeServiceNumber}
+      amount: ${output.cashout_data.cashoutAmount}
+
+- extendedWaitUntil:
+    visible: ${output.cashout_data.transactionDetails}
+    timeout: 10000
+- scroll
+
+## assert if the amount and the total are equal
+- assertVisible: "${output.cashout_data.orangeServiceNumber}"
+- assertVisible: "${output.cashout_data.displayedAmount} XAF"
+- assertVisible: "${output.cashout_data.orangeServiceCharge} XAF"
+- assertVisible: "${output.cashout_data.orangeTotalAmount} XAF"
+- tapOn:
+    id: "CollectionPreviewConfirmButton"
+## assert successful transaction
+- extendedWaitUntil:
+    visible: "Collection Details"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "Success"
+    timeout: 30000

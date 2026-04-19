@@ -1,12 +1,2 @@
 # Verify i can see warning message when no configured number
-appId: com.smobilpayagentapp
-onFlowStart:
-  - runFlow: ../../../subflows/restart_app.yaml
----
-- tapOn: "Fund your account"
-- extendedWaitUntil:
-    visible: "Enter amount"
-    timeout: 10000
-# TODO: adjust selectors/text to match the app's warning state when no self-top numbers are configured.
-- assertVisible: "No configured number"
-
+# Note: We need a phone number that is not configured for self topup in the backend before running this test

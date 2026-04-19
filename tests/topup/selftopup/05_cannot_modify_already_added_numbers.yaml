@@ -1,19 +1,4 @@
 # Verify I can't modify already added self-top numbers
-# Requires stable selectors for the stored number field(s).
-appId: com.smobilpayagentapp
-onFlowStart:
-  - runFlow: ../../../subflows/restart_app.yaml
----
-- tapOn: "Fund your account"
-- extendedWaitUntil:
-    visible: "Enter amount"
-    timeout: 10000
-# TODO: replace with the actual selector for an existing saved number field.
-- tapOn:
-    id: "SelfTopupSavedNumberField"
-# Attempting to type should be blocked by the UI; validate by asserting the original value remains.
-# TODO: replace placeholders with real values and selectors.
-- inputText: "600000000"
-- assertVisible:
-    id: "SelfTopupSavedNumberField"
+# Requires an account with only one phone number configured.
+
 

@@ -12,6 +12,9 @@ APP_DIR="${APP_DIR:-/app/app}"
 SUITES_DIR="${SUITES_DIR:-/app/config/suites}"
 INSTALL_ONLY="${INSTALL_ONLY:-0}"
 DRY_RUN="${DRY_RUN:-0}"
+MAESTRO_VERBOSE="${MAESTRO_VERBOSE:-0}"
+MAESTRO_DEBUG_OUTPUT_DIR="${MAESTRO_DEBUG_OUTPUT_DIR:-}"
+MAESTRO_FORMAT="${MAESTRO_FORMAT:-junit}"
 
 resolve_app_version() {
     local apk_path="$1"
@@ -196,7 +199,25 @@ for test_file in "${TEST_FILES[@]}"; do
 
     test_name="$(basename "${test_file}" .yaml)"
     junit_xml="junit-results/${test_name}.xml"
-    timeout "${TEST_TIMEOUT}" maestro --device "${DEVICE}" test "${test_file}" --format junit --output "${junit_xml}"
+
+    maestro_args=(maestro --device "${DEVICE}")
+    if [ "${MAESTRO_VERBOSE}" = "1" ]; then
+        maestro_args+=(--verbose)
+    fi
+
+    test_args=(test "${test_file}")
+    if [ -n "${MAESTRO_DEBUG_OUTPUT_DIR}" ]; then
+        mkdir -p "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}"
+        test_args+=(--debug-output "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" --flatten-debug-output)
+    fi
+
+    if [ "${MAESTRO_FORMAT}" = "junit" ]; then
+        test_args+=(--format junit --output "${junit_xml}")
+    elif [ -n "${MAESTRO_FORMAT}" ] && [ "${MAESTRO_FORMAT}" != "none" ]; then
+        test_args+=(--format "${MAESTRO_FORMAT}")
+    fi
+
+    timeout "${TEST_TIMEOUT}" "${maestro_args[@]}" "${test_args[@]}"
     RESULT=$?
 
     if [ -f "${junit_xml}" ]; then
@@ -221,11 +242,15 @@ for test_file in "${TEST_FILES[@]}"; do
     fi
 done
 
-echo "Converting JUnit XML to Allure results..."
-if [ -x "./scripts/junit_to_allure.sh" ]; then
-    ./scripts/junit_to_allure.sh junit-results allure-results || true
+if [ "${MAESTRO_FORMAT}" = "junit" ]; then
+    echo "Converting JUnit XML to Allure results..."
+    if [ -x "./scripts/junit_to_allure.sh" ]; then
+        ./scripts/junit_to_allure.sh junit-results allure-results || true
+    else
+        echo "[WARN] Missing converter script ./scripts/junit_to_allure.sh; Allure results will not be generated." >&2
+    fi
 else
-    echo "[WARN] Missing converter script ./scripts/junit_to_allure.sh; Allure results will not be generated." >&2
+    echo "Skipping Allure conversion (MAESTRO_FORMAT=${MAESTRO_FORMAT})."
 fi
 
 echo "Fixing permissions for Allure results..."

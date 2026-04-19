@@ -1,9 +1,7 @@
-// data/login/user.js
+// Data for login tests
 const strings = {
-  wrongPasswordText:
-    "Incorrect password! Please review your password and retry again.\\n\\n \\[Error Code 300\\]",
-  wrongUsernameText:
-    "This user was not found in the system.\\n\\n \\[Error Code 303\\]",
+  wrongPasswordText: "Incorrect credentials.",
+  wrongUsernameText: "Please check your information and try again.",
 };
 
 output.strings = strings;

@@ -5,6 +5,9 @@ APK_URL ?= https://expo.dev/artifacts/eas/czMwkPWpEviGGfVSv9XCka.apk
 TEST_SUITE ?= regression
 TEST_PATH ?=
 DEVICE ?= localhost:5555
+MAESTRO_VERBOSE ?= 0
+MAESTRO_FORMAT ?= junit
+MAESTRO_DEBUG_OUTPUT_DIR ?=
 
 pull:
 	docker compose pull
@@ -45,7 +48,7 @@ run-tests:
 	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" maestro --device $(DEVICE) test $${TEST_PATH:-tests}
 
 test-docker:
-	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" docker compose up --build maestro-runner
+	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" MAESTRO_VERBOSE=$(MAESTRO_VERBOSE) MAESTRO_FORMAT=$(MAESTRO_FORMAT) MAESTRO_DEBUG_OUTPUT_DIR="$(MAESTRO_DEBUG_OUTPUT_DIR)" docker compose up --build maestro-runner
 
 dry-run:
 	TEST_SUITE=$(TEST_SUITE) TEST_PATH=$(TEST_PATH) APP_VERSION=$(APP_VERSION) APK_URL="$(APK_URL)" DRY_RUN=1 docker compose run --rm maestro-runner

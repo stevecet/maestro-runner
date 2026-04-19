@@ -1,0 +1,23 @@
+## Verify as a Smobilpay Agent, I can view topup request history
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../../subflows/restart_app.yaml
+  - runFlow: ../../../subflows/request_topup/create_request_topup.yaml
+---
+- tapOn: "\ue24b"
+- tapOn: "Topup Request History"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.historyTitle}"
+    timeout: 20000
+- assertVisible: "${output.request_topup_data.bankName}"
+- assertVisible: "${output.request_topup_data.historyAmountText}"
+
+# Open first item and go back
+- tapOn: "${output.request_topup_data.bankName}"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.detailTitle}"
+    timeout: 20000
+- tapOn: "Navigate up"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.historyTitle}"
+    timeout: 20000

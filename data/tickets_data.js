@@ -1,4 +1,4 @@
-// data/tickets/strings.js
+// data/tickets_data.js
 const strings = {
   newTicketText: "New Ticket",
   descriptionText: "Description",

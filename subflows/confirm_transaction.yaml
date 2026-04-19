@@ -9,5 +9,8 @@ appId: com.smobilpayagentapp
 - tapOn:
     id: "CollectionPreviewConfirmButton"
 - extendedWaitUntil:
+    visible: "Collection Details"
+    timeout: 20000
+- extendedWaitUntil:
     visible: "Success"
     timeout: 200000

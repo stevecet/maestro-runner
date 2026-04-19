@@ -1,4 +1,4 @@
-// data/cashin/data.js
+// data/cashin_data.js
 const cashin_data = {
   orangeServiceNumber: "690935868",
   mtnServiceNumber: "650134682",

@@ -1,0 +1,34 @@
+## Verify as a Smobilpay Agent, I can cancel a topup request when the option is available
+appId: com.smobilpayagentapp
+onFlowStart:
+#   - runFlow: ../../../subflows/restart_app.yaml
+#   - runFlow: ../../../subflows/request_topup/create_request_topup.yaml
+    - runScript: ../../../data/request_topup_data.js
+---
+# - tapOn: "\ue24b"
+# - tapOn: "Topup Request History"
+# - extendedWaitUntil:
+#     visible: "${output.request_topup_data.historyTitle}"
+#     timeout: 20000
+
+# - tapOn: "${output.request_topup_data.bankName}"
+# - extendedWaitUntil:
+#     visible: "${output.request_topup_data.detailTitle}"
+#     timeout: 20000
+
+# Cancel top-up request modal should only be visible if the request is still pending review (i.e. not reviewed yet)
+- runFlow:
+    when:
+      visible: "${output.request_topup_data.cancelRequestText}"
+    commands:
+      - tapOn:
+          text: "${output.request_topup_data.cancelRequestText}"
+      - tapOn:
+          id: "text-input-outline"
+      - inputText: "${output.request_topup_data.cancellationReason}"
+      - back
+      - tapOn:
+          text: "Save"
+          optional: true
+
+- assertVisible: "${output.request_topup_data.cancelledRequestBannerText}"

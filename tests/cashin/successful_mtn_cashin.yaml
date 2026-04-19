@@ -3,7 +3,7 @@ appId: com.smobilpayagentapp
 onFlowStart:
   - runFlow: ../../subflows/restart_app.yaml
 ---
-- runScript: ../../data/cashin/data.js
+- runScript: ../../data/cashin_data.js
 - tapOn: "View all services"
 - tapOn:
     id: "search-bar"

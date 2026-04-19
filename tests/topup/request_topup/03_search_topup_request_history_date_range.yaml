@@ -1,0 +1,44 @@
+## Verify as a Smobilpay Agent, I can open and use date range search on topup request history
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../../subflows/restart_app.yaml
+  - runFlow: ../../../subflows/request_topup/create_request_topup.yaml
+  - runScript: ../../../data/request_topup_data.js
+  - runScript: ../../../data/utils/date_today.js
+---
+- tapOn: "\ue24b"
+- tapOn: "Topup Request History"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.historyTitle}"
+    timeout: 20000
+
+# Open the search dialog (top-right icon)
+- tapOn:
+    id: "icon-button"
+- extendedWaitUntil:
+    visible: "Search another date range"
+    timeout: 20000
+- assertVisible: "CANCEL"
+- assertVisible: "SEARCH"
+
+# Cancel should close the dialog
+- tapOn: "CANCEL"
+- assertNotVisible: "Search another date range"
+
+# Re-open and search (with today's date range) should close the dialog
+- tapOn:
+    id: "icon-button"
+- extendedWaitUntil:
+    visible: "Search another date range"
+    timeout: 20000
+- tapOn: "TransactionTopupSearchDialog-BtnShowFromDate"
+- tapOn: "${output.date_today.dayOfMonth}"
+
+- tapOn: "OK"
+- tapOn: "SEARCH"
+- extendedWaitUntil:
+    notVisible: "Search another date range"
+    timeout: 20000
+- assertVisible: "${output.request_topup_data.bankName}"
+- assertVisible: "New"
+- assertVisible: "${output.request_topup_data.historyAmountText}"

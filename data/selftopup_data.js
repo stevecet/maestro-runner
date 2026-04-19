@@ -1,4 +1,4 @@
-// data/selftopup/data.js
+// data/selftopup_data.js
 const selftopup_data = {
   orangeServiceNumber: "697123000",
   mtnServiceNumber: "650134682",

@@ -1,0 +1,36 @@
+# subflows/request_topup/create_request_topup.yaml
+appId: com.smobilpayagentapp
+---
+- runScript: ../../data/request_topup_data.js
+- tapOn: "Top-up my account"
+- tapOn: "Request top-up"
+- tapOn: "Proceed"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.selectBankText}"
+    timeout: 20000
+- tapOn:
+    id: "text-input-outline"
+- inputText: ${output.request_topup_data.validAmount}
+- back
+- tapOn: "${output.request_topup_data.selectBankText}"
+- tapOn: "${output.request_topup_data.bankName}"
+- tapOn: "${output.request_topup_data.selectAccountPlaceholderText}"
+- tapOn: "${output.request_topup_data.accountNumber}"
+- scroll
+- tapOn:
+    id: "text-input-outline"
+- inputText: "${output.request_topup_data.motif}"
+- back
+- scroll
+- tapOn: "No attachment"
+- tapOn: "TAKE PHOTO"
+- tapOn: "Shutter"
+- tapOn: "Done"
+- tapOn: "Proceed"
+- extendedWaitUntil:
+    visible: "Top-up review"
+    timeout: 10000
+- tapOn: "Submit Top-up Request"
+- extendedWaitUntil:
+    visible: "Top-up request submitted successfully"
+    timeout: 10000

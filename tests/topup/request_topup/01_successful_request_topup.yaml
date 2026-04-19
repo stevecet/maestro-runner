@@ -1,0 +1,65 @@
+## Verify as a Smobilpay Agent, I can do request topup successfully
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../../subflows/restart_app.yaml
+---
+- runScript: ../../../data/request_topup_data.js
+- tapOn: "Top-up my account"
+- tapOn: "Request top-up"
+- tapOn: "Proceed"
+- extendedWaitUntil:
+    visible: "${output.request_topup_data.selectBankText}"
+    timeout: 20000
+- assertVisible: "${output.request_topup_data.selectBankText}"
+- assertVisible: "${output.request_topup_data.selectAccountPlaceholderText}"
+- assertVisible:
+    text: "${output.request_topup_data.proceedText}"
+    enabled: false
+
+# Negative amount inline (-100) then correct it
+- tapOn:
+    id: "text-input-outline"
+- inputText: "${output.request_topup_data.invalidAmount}"
+- back
+- assertVisible:
+    text: "${output.request_topup_data.proceedText}"
+    enabled: false
+- tapOn:
+    id: "text-input-outline"
+- eraseText
+- inputText: "${output.request_topup_data.validAmount}"
+- back
+- tapOn: "${output.request_topup_data.selectBankText}"
+- tapOn: "${output.request_topup_data.bankName}"
+- tapOn: "${output.request_topup_data.selectAccountPlaceholderText}"
+- tapOn: "${output.request_topup_data.accountNumber}"
+- scroll
+
+# Motif/reference is required before proceeding
+- assertVisible:
+    text: "${output.request_topup_data.proceedText}"
+    enabled: false
+- tapOn:
+    id: "text-input-outline"
+- inputText: "${output.request_topup_data.motif}"
+- back
+- scroll
+- tapOn: "No attachment"
+- tapOn: "TAKE PHOTO"
+- tapOn: "Shutter"
+- tapOn: "Done"
+- assertVisible:
+    text: "${output.request_topup_data.proceedText}"
+    enabled: true
+- tapOn: "${output.request_topup_data.proceedText}"
+- extendedWaitUntil:
+    visible: "Top-up review"
+    timeout: 10000
+- assertVisible: "${output.request_topup_data.reviewAmountText}"
+- assertVisible: "${output.request_topup_data.bankName}"
+- assertVisible: "${output.request_topup_data.accountNumber}"
+- assertVisible: "${output.request_topup_data.motif}"
+- tapOn: "Submit Top-up Request"
+- extendedWaitUntil:
+    visible: "Top-up request submitted successfully"
+    timeout: 10000

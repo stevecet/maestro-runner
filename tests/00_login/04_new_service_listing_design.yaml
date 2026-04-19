@@ -1,0 +1,8 @@
+appId: com.smobilpayagentapp
+onFlowStart:
+  - runFlow: ../../subflows/restart_app.yaml
+---
+- assertVisible: "View all services"
+- assertVisible: "Browse all the services available"
+- tapOn: "View all services"
+- assertVisible: "Services"

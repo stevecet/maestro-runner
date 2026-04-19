@@ -61,6 +61,18 @@ Run the default regression suite in Docker:
 make test-docker
 ```
 
+Show step-by-step execution output (verbose):
+
+```bash
+make test-docker MAESTRO_VERBOSE=1
+```
+
+Collect per-test debug output (screenshots/logs) into a folder:
+
+```bash
+make test-docker MAESTRO_DEBUG_OUTPUT_DIR=maestro-debug
+```
+
 Run a specific suite:
 
 ```bash

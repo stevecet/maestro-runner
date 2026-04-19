@@ -1,4 +1,4 @@
-// data/topup/data.js
+// data/airtime_data.js
 const topup_data = {
   orangeServiceNumber: "658975641",
   mtnServiceNumber: "650134682",
