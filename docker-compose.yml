@@ -35,6 +35,9 @@ services:
       - APP_PACKAGE=${APP_PACKAGE:-com.smobilpayagentapp}
       - HOME=/tmp
       - ANDROID_SDK_HOME=/tmp
+      - MAESTRO_CLI_NO_ANALYTICS=1
+      - MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
+      - JAVA_TOOL_OPTIONS=-Duser.home=/tmp
     volumes:
       - .:/app:ro
       - ./app:/app/app

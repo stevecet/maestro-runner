@@ -9,6 +9,11 @@ fi
 export ANDROID_SDK_HOME="${ANDROID_SDK_HOME:-$HOME}"
 mkdir -p "${HOME}/.android" "${ANDROID_SDK_HOME}/.android" || true
 
+# Avoid interactive prompts and ensure Maestro can write its state under a writable home.
+export MAESTRO_CLI_NO_ANALYTICS="${MAESTRO_CLI_NO_ANALYTICS:-1}"
+export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED="${MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED:-true}"
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:--Duser.home=${HOME}}"
+
 DEVICE="${DEVICE:-android-emulator:5555}"
 TEST_TIMEOUT="${TEST_TIMEOUT:-600}"
 APP_PACKAGE="${APP_PACKAGE:-com.smobilpayagentapp}"
