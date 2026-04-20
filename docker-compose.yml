@@ -41,6 +41,8 @@ services:
     volumes:
       - .:/app:ro
       - ./app:/app/app
+      - ./junit-results:/tmp/maestro-results/junit-results
+      - ./allure-results:/tmp/maestro-results/allure-results
     depends_on:
       android-emulator:
         condition: service_healthy
