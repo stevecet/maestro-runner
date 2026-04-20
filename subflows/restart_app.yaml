@@ -8,11 +8,8 @@ appId: com.smobilpayagentapp
 #     visible:
 #       id: "android:id/button1"
 #     timeout: 60000
-- assertVisible:
-    id: "android:id/button1"
-    optional: true
 - tapOn:
-    id: "android:id/button1" 
+    id: "android:id/button1"
     optional: true
 - tapOn:
     id: "LoginFormPassword"

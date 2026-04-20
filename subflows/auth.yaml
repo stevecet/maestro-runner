@@ -5,7 +5,6 @@ appId: com.smobilpayagentapp
     clearState: true
 - tapOn:
     id: "GetStartedButton"
-- tapOn: "Yes, I have an existing account"
 - tapOn:
     id: "InitialLoginFormUsername"
 - inputText: ${username}
@@ -16,4 +15,4 @@ appId: com.smobilpayagentapp
 - hideKeyboard
 # Tapping the left side of the Login button at the bottom (90% height)
 - tapOn:
-    point: "20%, 90%"
+    point: "20%, 70%"
