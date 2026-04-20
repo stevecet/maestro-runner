@@ -24,5 +24,8 @@ WORKDIR /app
 # Copy your local flows and .apk into the container
 COPY . .
 
+# Ensure scripts are executable
+RUN chmod +x run_tests.sh scripts/*.sh 2>/dev/null || true
+
 # Keep the container alive or run a default command
 CMD ["maestro", "--version"]

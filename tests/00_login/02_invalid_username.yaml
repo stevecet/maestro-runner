@@ -3,8 +3,6 @@ appId: com.smobilpayagentapp
 ---
 - runScript: ../../data/login/user.js
 - runScript: ../../data/login/strings.js
-- launchApp:
-    clearState: true
 - runFlow:
     file: ../../subflows/auth.yaml
     env:
