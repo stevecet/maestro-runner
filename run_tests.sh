@@ -2,6 +2,13 @@
 
 set -uo pipefail
 
+# Ensure adb has a writable HOME for ~/.android (common when running the container with a numeric UID).
+if [ -z "${HOME:-}" ] || [ ! -w "${HOME:-/}" ]; then
+    export HOME="/tmp"
+fi
+export ANDROID_SDK_HOME="${ANDROID_SDK_HOME:-$HOME}"
+mkdir -p "${HOME}/.android" "${ANDROID_SDK_HOME}/.android" || true
+
 DEVICE="${DEVICE:-android-emulator:5555}"
 TEST_TIMEOUT="${TEST_TIMEOUT:-600}"
 APP_PACKAGE="${APP_PACKAGE:-com.smobilpayagentapp}"

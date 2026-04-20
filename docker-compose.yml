@@ -33,6 +33,8 @@ services:
       - TEST_SUITE=${TEST_SUITE:-regression}
       - TEST_PATH=${TEST_PATH:-}
       - APP_PACKAGE=${APP_PACKAGE:-com.smobilpayagentapp}
+      - HOME=/tmp
+      - ANDROID_SDK_HOME=/tmp
     volumes:
       - .:/app:ro
       - ./app:/app/app
