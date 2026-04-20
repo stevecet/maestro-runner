@@ -4,12 +4,16 @@ appId: com.smobilpayagentapp
 - runScript: ../data/login/user.js
 - stopApp: "com.smobilpayagentapp"
 - launchApp: "com.smobilpayagentapp"
-- extendedWaitUntil:
-    visible:
-      id: "android:id/button1"
-    timeout: 60000
+# - extendedWaitUntil:
+#     visible:
+#       id: "android:id/button1"
+#     timeout: 60000
+- assertVisible:
+    id: "android:id/button1"
+    optional: true
 - tapOn:
     id: "android:id/button1" 
+    optional: true
 - tapOn:
     id: "LoginFormPassword"
 - inputText: ${output.users.validUser.password}
