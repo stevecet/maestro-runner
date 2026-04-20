@@ -13,6 +13,6 @@ appId: com.smobilpayagentapp
     id: "InitialLoginFormPassword"
 - inputText: ${password}
 - hideKeyboard
-# Tapping the left side of the Login button at the bottom (90% height)
+# Tapping the left side of the Login button at the bottom (70% height)
 - tapOn:
-    point: "20%, 70%"
+    point: "20%,77%"
