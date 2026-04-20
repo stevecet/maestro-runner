@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        ALLURE_RESULTS_PATH = 'allure-results'
+        ALLURE_RESULTS_PATH = 'ci-allure-results'
+        JUNIT_RESULTS_PATH = 'ci-junit-results'
     }
 
     options {
@@ -13,9 +14,9 @@ pipeline {
 
     parameters {
         string(name: 'APP_VERSION', defaultValue: 'latest', description: 'APK version folder from app/versions to install before tests')
-        choice(name: 'TEST_SUITE', choices: ['smoke', 'login', 'payments', 'selftopup', 'regression'], description: 'Suite manifest to execute')
+        choice(name: 'TEST_SUITE', choices: ['regression', 'smoke'], description: 'Suite manifest to execute')
         string(name: 'TEST_PATH', defaultValue: '', description: 'Optional test file or folder override. Leave empty to use TEST_SUITE.')
-        string(name: 'APK_URL', defaultValue: 'https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk', description: 'Optional APK URL used when the selected version is not stored locally')
+        string(name: 'APK_URL', defaultValue: 'https://expo.dev/artifacts/eas/czMwkPWpEviGGfVSv9XCka.apk', description: 'Optional APK URL used when the selected version is not stored locally')
     }
 
     stages {
@@ -55,17 +56,23 @@ pipeline {
                 script {
                     def uid = sh(script: 'id -u', returnStdout: true).trim()
                     def gid = sh(script: 'id -g', returnStdout: true).trim()
+                    sh(script: "rm -rf ${env.ALLURE_RESULTS_PATH} ${env.JUNIT_RESULTS_PATH} && mkdir -p ${env.ALLURE_RESULTS_PATH} ${env.JUNIT_RESULTS_PATH}")
                     def runnerEnv = [
                         "APP_VERSION=${params.APP_VERSION}",
                         "TEST_SUITE=${params.TEST_SUITE}",
                         "TEST_PATH=${params.TEST_PATH}",
                         "APK_URL=${params.APK_URL}",
                         "DOCKER_UID=${uid}",
-                        "DOCKER_GID=${gid}"
+                        "DOCKER_GID=${gid}",
+                        "RESULTS_ROOT=/tmp/maestro-results"
                     ].join(' ')
 
                     // Use returnStatus: true to handle test failures without aborting the pipeline
                     def exitCode = sh(script: "${runnerEnv} docker compose up --build maestro-runner", returnStatus: true)
+
+                    // Copy results from the runner container into the workspace before containers are torn down.
+                    sh(script: "docker cp maestro-tester:/tmp/maestro-results/junit-results/. ${env.JUNIT_RESULTS_PATH} || true", returnStatus: true)
+                    sh(script: "docker cp maestro-tester:/tmp/maestro-results/allure-results/. ${env.ALLURE_RESULTS_PATH} || true", returnStatus: true)
                     
                     if (exitCode != 0) {
                         currentBuild.result = 'UNSTABLE'
@@ -81,8 +88,8 @@ pipeline {
     post {
         always {
             script {
-                junit testResults: 'junit-results/*.xml', allowEmptyResults: true
-                allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+                junit testResults: "${env.JUNIT_RESULTS_PATH}/*.xml", allowEmptyResults: true
+                allure includeProperties: false, jdk: '', results: [[path: "${env.ALLURE_RESULTS_PATH}"]]
                 sh 'docker compose down'
             }
         }

@@ -12,8 +12,10 @@ appId: com.smobilpayagentapp
 - tapOn:
     id: "InitialLoginFormPassword"
 - inputText: ${password}
-- back
+- hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: "InitialLoginFormButtonLogin"
+    timeout: 10000
 - tapOn:
     id: "InitialLoginFormButtonLogin"
-    point: "10%,50%"
-    retryTapIfNoChange: true

@@ -27,6 +27,12 @@ DRY_RUN="${DRY_RUN:-0}"
 MAESTRO_VERBOSE="${MAESTRO_VERBOSE:-0}"
 MAESTRO_DEBUG_OUTPUT_DIR="${MAESTRO_DEBUG_OUTPUT_DIR:-}"
 MAESTRO_FORMAT="${MAESTRO_FORMAT:-junit}"
+RESULTS_ROOT="${RESULTS_ROOT:-/tmp/maestro-results}"
+JUNIT_RESULTS_DIR="${JUNIT_RESULTS_DIR:-junit-results}"
+ALLURE_RESULTS_DIR="${ALLURE_RESULTS_DIR:-allure-results}"
+
+JUNIT_RESULTS_PATH="${RESULTS_ROOT}/${JUNIT_RESULTS_DIR}"
+ALLURE_RESULTS_PATH="${RESULTS_ROOT}/${ALLURE_RESULTS_DIR}"
 
 resolve_app_version() {
     local apk_path="$1"
@@ -143,7 +149,7 @@ while [ "$(adb -s "${DEVICE}" shell getprop sys.boot_completed | tr -d '\r')" !=
 done
 echo "Device is ready."
 
-mkdir -p "${APP_DIR}/versions" allure-results junit-results
+mkdir -p "${APP_DIR}/versions" "${ALLURE_RESULTS_PATH}" "${JUNIT_RESULTS_PATH}"
 
 APK_PATH="$(resolve_apk_path)"
 if ! APK_PATH="$(download_apk_if_needed "${APK_PATH}")"; then
@@ -164,16 +170,16 @@ if [ "${INSTALL_ONLY}" = "1" ]; then
     exit 0
 fi
 
-rm -rf allure-results/* junit-results/*
-mkdir -p allure-results junit-results
-cat <<EOF > allure-results/environment.properties
+rm -rf "${ALLURE_RESULTS_PATH:?}/"* "${JUNIT_RESULTS_PATH:?}/"* 2>/dev/null || true
+mkdir -p "${ALLURE_RESULTS_PATH}" "${JUNIT_RESULTS_PATH}"
+cat <<EOF > "${ALLURE_RESULTS_PATH}/environment.properties"
 Device=${DEVICE}
 AppId=${APP_PACKAGE}
 Suite=${TEST_SUITE}
 AppVersion=${APP_VERSION}
 Environment=Development/WSL
 EOF
-cat <<EOF > allure-results/categories.json
+cat <<EOF > "${ALLURE_RESULTS_PATH}/categories.json"
 [
   {
     "name": "Maestro Assertions",
@@ -210,7 +216,7 @@ for test_file in "${TEST_FILES[@]}"; do
     echo "Running test: ${test_file}"
 
     test_name="$(basename "${test_file}" .yaml)"
-    junit_xml="junit-results/${test_name}.xml"
+    junit_xml="${JUNIT_RESULTS_PATH}/${test_name}.xml"
 
     maestro_args=(maestro --device "${DEVICE}")
     if [ "${MAESTRO_VERBOSE}" = "1" ]; then
@@ -219,7 +225,7 @@ for test_file in "${TEST_FILES[@]}"; do
 
     test_args=(test "${test_file}")
     if [ -n "${MAESTRO_DEBUG_OUTPUT_DIR}" ]; then
-        mkdir -p "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}"
+        mkdir -p "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" || true
         test_args+=(--debug-output "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" --flatten-debug-output)
     fi
 
@@ -257,7 +263,7 @@ done
 if [ "${MAESTRO_FORMAT}" = "junit" ]; then
     echo "Converting JUnit XML to Allure results..."
     if [ -x "./scripts/junit_to_allure.sh" ]; then
-        ./scripts/junit_to_allure.sh junit-results allure-results || true
+        ./scripts/junit_to_allure.sh "${JUNIT_RESULTS_PATH}" "${ALLURE_RESULTS_PATH}" || true
     else
         echo "[WARN] Missing converter script ./scripts/junit_to_allure.sh; Allure results will not be generated." >&2
     fi
@@ -265,8 +271,10 @@ else
     echo "Skipping Allure conversion (MAESTRO_FORMAT=${MAESTRO_FORMAT})."
 fi
 
-echo "Fixing permissions for Allure results..."
-chmod -R 777 allure-results junit-results
+echo "Fixing permissions for result folders..."
+chmod -R 777 "${ALLURE_RESULTS_PATH}" "${JUNIT_RESULTS_PATH}" >/dev/null 2>&1 || true
 
 echo "Test run finished with code ${EXIT_CODE}"
+echo "JUnit results: ${JUNIT_RESULTS_PATH}"
+echo "Allure results: ${ALLURE_RESULTS_PATH}"
 exit "${EXIT_CODE}"

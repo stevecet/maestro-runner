@@ -41,8 +41,6 @@ services:
     volumes:
       - .:/app:ro
       - ./app:/app/app
-      - ./allure-results:/app/allure-results
-      - ./junit-results:/app/junit-results
     depends_on:
       android-emulator:
         condition: service_healthy
