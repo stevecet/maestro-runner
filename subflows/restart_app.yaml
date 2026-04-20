@@ -17,9 +17,9 @@ appId: com.smobilpayagentapp
 - tapOn:
     id: "LoginFormPassword"
 - inputText: ${output.users.validUser.password}
-- back
+- hideKeyboard
 - tapOn:
     id: "LoginFormLogin"
 - extendedWaitUntil:
     visible: "Favourite Services"
-    timeout: 200000
+    timeout: ${GLOBAL_TIMEOUT}

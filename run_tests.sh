@@ -223,7 +223,7 @@ for test_file in "${TEST_FILES[@]}"; do
         maestro_args+=(--verbose)
     fi
 
-    test_args=(test "${test_file}")
+    test_args=(test "${test_file}" --env GLOBAL_TIMEOUT="${GLOBAL_TIMEOUT:-30000}")
     if [ -n "${MAESTRO_DEBUG_OUTPUT_DIR}" ]; then
         mkdir -p "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" || true
         test_args+=(--debug-output "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" --flatten-debug-output)

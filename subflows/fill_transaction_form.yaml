@@ -7,10 +7,10 @@ appId: com.smobilpayagentapp
 - tapOn:
     id: "AmountFormServiceNumber"
 - inputText: ${serviceNumber}
-- back
+- hideKeyboard
 - tapOn:
     id: "AmountFormAmount"
 - inputText: ${amount}
-- back
+- hideKeyboard
 - tapOn:
     id: "AmountFormSubmit"

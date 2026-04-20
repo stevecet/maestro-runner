@@ -38,6 +38,7 @@ services:
       - MAESTRO_CLI_NO_ANALYTICS=1
       - MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
       - JAVA_TOOL_OPTIONS=-Duser.home=/tmp
+      - GLOBAL_TIMEOUT=30000
     volumes:
       - .:/app:ro
       - ./app:/app/app
