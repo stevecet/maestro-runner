@@ -218,6 +218,15 @@ for test_file in "${TEST_FILES[@]}"; do
     test_name="$(basename "${test_file}" .yaml)"
     junit_xml="${JUNIT_RESULTS_PATH}/${test_name}.xml"
 
+    # Derive suite name from the folder path relative to tests/
+    suite_dir="$(dirname "${test_file}")"
+    suite_dir="${suite_dir#tests/}"
+    if [ -z "${suite_dir}" ] || [ "${suite_dir}" = "." ] || [ "${suite_dir}" = "tests" ]; then
+        suite_name="General"
+    else
+        suite_name="${suite_dir}"
+    fi
+
     maestro_args=(maestro --device "${DEVICE}")
     if [ "${MAESTRO_VERBOSE}" = "1" ]; then
         maestro_args+=(--verbose)
@@ -239,7 +248,8 @@ for test_file in "${TEST_FILES[@]}"; do
     RESULT=$?
 
     if [ -f "${junit_xml}" ]; then
-        sed -i "s/name=\"Test Suite\"/name=\"${test_name}\"/g" "${junit_xml}"
+        # Rewrite the testsuite name to the folder path so Allure groups by suite folder
+        sed -i "s/name=\"[^\"]*\"/name=\"${suite_name}\"/" "${junit_xml}"
         sed -i "s/classname=\"Flow\"/classname=\"${test_name}\"/g" "${junit_xml}"
     fi
 

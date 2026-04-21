@@ -1,7 +1,7 @@
 ## Verify as a Smobilpay Agent, I can do a cashout via Orange successfully
 appId: com.smobilpayagentapp
-# onFlowStart:
-#   - runFlow: ../../subflows/restart_app.yaml
+onFlowStart:
+  - runFlow: ../../subflows/restart_app.yaml
 ---
 - runScript: ../../data/cashout_data.js
 - runFlow:
