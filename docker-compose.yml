@@ -1,26 +1,26 @@
 services:
   android-emulator:
     container_name: android-emulator
-    image: budtmo/docker-android:emulator_11.0
+    image: budtmo/docker-android:emulator_14.0
     privileged: true
     ports:
-      - 6080:6080
-      - 5554:5554
-      - 5555:5555
+      - "6080:6080"
+      - "5554:5554"
+      - "5555:5555"
     environment:
-      DEVICE: "pixel"
+      EMULATOR_DEVICE: "Samsung Galaxy S10"
       WEB_VNC: "true"
       APPIUM: "false"
       EMULATOR_TIMEOUT: "900"
       RELAXED_SECURITY: "true"
-      EMULATOR_ARGS: "-gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim"
-    shm_size: '4gb'
+      EMULATOR_ARGS: "-gpu software -no-snapshot -noaudio -no-boot-anim" 
+    shm_size: 6gb
     healthcheck:
       test: ["CMD-SHELL", "adb devices | grep -q 'device$'"]
       interval: 10s
       timeout: 5s
       retries: 60
-      start_period: 30s
+      start_period: 45s 
   maestro-runner:
     build: .
     image: steveceto/maestro-runner:latest
@@ -28,17 +28,18 @@ services:
     command: /app/run_tests.sh
     user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
     environment:
-      - APK_URL=${APK_URL:-https://expo.dev/artifacts/eas/pNjGzRbdX8ftuNhJFBv3QG.apk}
-      - APP_VERSION=${APP_VERSION:-latest}
+      - APK_PATH=/app/app/smobilpay.apk
+      - APK_URL=${APK_URL:-https://expo.dev/artifacts/eas/a_SbXg_Oq_iLv9mZFdCKroUcMq23onlkT4A-uGL3wrM.apk}
       - TEST_SUITE=${TEST_SUITE:-regression}
       - TEST_PATH=${TEST_PATH:-}
       - APP_PACKAGE=${APP_PACKAGE:-com.smobilpayagentapp}
+      - DEVICE=${DEVICE:-android-emulator:5555}
+      - INSTALL_ONLY=${INSTALL_ONLY:-0}
       - HOME=/tmp
       - ANDROID_SDK_HOME=/tmp
       - MAESTRO_CLI_NO_ANALYTICS=1
       - MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
       - JAVA_TOOL_OPTIONS=-Duser.home=/tmp
-      - GLOBAL_TIMEOUT=30000
     volumes:
       - .:/app:ro
       - ./app:/app/app
@@ -59,4 +60,8 @@ services:
       MOCKSERVER_LIVENESS_HTTP_GET_PATH: "/mockserver/status"
     volumes:
       - ./mockserver:/config
-    command: -proxyPort 1080 -initializationJsonPath /config/initializer.json
+    command:
+      - "-p"
+      - "1080"
+      - "--init"
+      - "/config/initializer.json"

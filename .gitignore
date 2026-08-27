@@ -4,7 +4,6 @@ Thumbs.db
 
 # Build artifacts and downloaded APKs
 app/*.apk
-app/versions/**/*.apk
 *.apk
 
 # Docker

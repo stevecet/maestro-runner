@@ -1,16 +1,12 @@
 # subflows/restart_app.yaml
+# Restart flow permitting to launch app when authenticated. Neccessary on all 
+# except login flows
 appId: com.smobilpayagentapp
 ---
+- runScript: ../data/config.js
 - runScript: ../data/login/user.js
 - stopApp: "com.smobilpayagentapp"
 - launchApp: "com.smobilpayagentapp"
-# - extendedWaitUntil:
-#     visible:
-#       id: "android:id/button1"
-#     timeout: 60000
-- tapOn:
-    id: "android:id/button1"
-    optional: true
 - tapOn:
     id: "LoginFormPassword"
 - inputText: ${output.users.validUser.password}
@@ -18,5 +14,5 @@ appId: com.smobilpayagentapp
 - tapOn:
     id: "LoginFormLogin"
 - extendedWaitUntil:
-    visible: "Favourite Services"
-    timeout: ${GLOBAL_TIMEOUT}
+    visible: "View all Services"
+    timeout: ${output.config.veryLongTimeout}

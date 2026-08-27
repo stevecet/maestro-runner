@@ -18,15 +18,15 @@ onFlowStart:
     id: "DescriptionTextInput"
 - inputText: ${output.strings.descriptionText}
 - back
-## Bug reported, as when you add an attachment the ticket takes infinite time to save even though behind its created
-# - tapOn:
-#     id: "FirstImagePicker"
-# - tapOn:
-#     id: "CameraButton"
-# - tapOn:
-#     id: "com.android.camera2:id/shutter_button"
-# - tapOn:
-#     id: "com.android.camera2:id/done_button"
+# Add an attachment to the ticket
+- tapOn:
+    id: "FirstImagePicker"
+- tapOn:
+    id: "CameraButton"
+- tapOn:
+    id: "com.android.camera2:id/shutter_button"
+- tapOn:
+    id: "com.android.camera2:id/done_button"
 - scroll
 - tapOn:
     id: "SubmitButton"

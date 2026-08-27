@@ -1,2 +1,0 @@
-# Verify i can see warning message when no configured number
-# Note: We need a phone number that is not configured for self topup in the backend before running this test

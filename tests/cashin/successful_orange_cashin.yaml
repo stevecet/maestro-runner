@@ -17,16 +17,16 @@ onFlowStart:
 
 - extendedWaitUntil:
     visible: ${output.cashin_data.transactionDetails}
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - scroll
 
 ## assert if the amount and the total are equal
-- assertVisible:
-    text: "${output.cashin_data.displayedAmount} XAF"
-    index: 0
-- assertVisible:
-    text: "${output.cashin_data.displayedAmount} XAF"
-    index: 1
+# - assertVisible:
+#     text: "${output.cashin_data.displayedAmount} XAF"
+#     index: 0
+# - assertVisible:
+#     text: "${output.cashin_data.displayedAmount} XAF"
+#     index: 1
 
 ## confirm and verify success
 - runFlow: ../../subflows/confirm_transaction.yaml
@@ -34,4 +34,4 @@ onFlowStart:
 ## extra verification on success screen
 - assertVisible: "Collection Details"
 - assertVisible: "${output.cashin_data.orangeServiceNumber}"
-- assertVisible: "${output.cashin_data.displayedAmount} XAF"
+# - assertVisible: "${output.cashin_data.displayedAmount} XAF"

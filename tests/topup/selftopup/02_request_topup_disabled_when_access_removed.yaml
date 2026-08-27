@@ -1,2 +1,0 @@
-# Verify I can see request Top-Up option disabled or not clickable when access is removed
-# Note: We need to manually disable access for request topup in the backend before running this test

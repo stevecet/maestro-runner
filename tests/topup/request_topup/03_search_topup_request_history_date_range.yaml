@@ -10,14 +10,14 @@ onFlowStart:
 - tapOn: "Topup Request History"
 - extendedWaitUntil:
     visible: "${output.request_topup_data.historyTitle}"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 
 # Open the search dialog (top-right icon)
 - tapOn:
     id: "icon-button"
 - extendedWaitUntil:
     visible: "Search another date range"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - assertVisible: "CANCEL"
 - assertVisible: "SEARCH"
 
@@ -30,7 +30,7 @@ onFlowStart:
     id: "icon-button"
 - extendedWaitUntil:
     visible: "Search another date range"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - tapOn: "TransactionTopupSearchDialog-BtnShowFromDate"
 - tapOn: "${output.date_today.dayOfMonth}"
 
@@ -38,7 +38,7 @@ onFlowStart:
 - tapOn: "SEARCH"
 - extendedWaitUntil:
     notVisible: "Search another date range"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - assertVisible: "${output.request_topup_data.bankName}"
 - assertVisible: "New"
 - assertVisible: "${output.request_topup_data.historyAmountText}"

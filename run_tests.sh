@@ -19,8 +19,8 @@ TEST_TIMEOUT="${TEST_TIMEOUT:-600}"
 APP_PACKAGE="${APP_PACKAGE:-com.smobilpayagentapp}"
 TEST_SUITE="${TEST_SUITE:-regression}"
 TEST_PATH="${TEST_PATH:-}"
-APP_VERSION="${APP_VERSION:-latest}"
 APP_DIR="${APP_DIR:-/app/app}"
+APK_PATH="${APK_PATH:-${APP_DIR}/smobilpay.apk}"
 SUITES_DIR="${SUITES_DIR:-/app/config/suites}"
 INSTALL_ONLY="${INSTALL_ONLY:-0}"
 DRY_RUN="${DRY_RUN:-0}"
@@ -34,53 +34,9 @@ ALLURE_RESULTS_DIR="${ALLURE_RESULTS_DIR:-allure-results}"
 JUNIT_RESULTS_PATH="${RESULTS_ROOT}/${JUNIT_RESULTS_DIR}"
 ALLURE_RESULTS_PATH="${RESULTS_ROOT}/${ALLURE_RESULTS_DIR}"
 
-resolve_app_version() {
-    local apk_path="$1"
-
-    if [ -n "${APP_VERSION}" ] && [ "${APP_VERSION}" != "latest" ]; then
-        echo "${APP_VERSION}"
-        return 0
-    fi
-
-    if [ -f "${APP_DIR}/current.version" ]; then
-        tr -d '[:space:]' < "${APP_DIR}/current.version"
-        return 0
-    fi
-
-    basename "$(dirname "${apk_path}")"
-}
-
-resolve_apk_path() {
-    if [ -n "${APK_PATH:-}" ] && [ -f "${APK_PATH}" ]; then
-        echo "${APK_PATH}"
-        return 0
-    fi
-
-    if [ -n "${APP_VERSION}" ] && [ "${APP_VERSION}" != "latest" ]; then
-        local version_dir="${APP_DIR}/versions/${APP_VERSION}"
-        if [ -d "${version_dir}" ]; then
-            find "${version_dir}" -maxdepth 1 -type f -name "*.apk" | sort | head -n 1
-            return 0
-        fi
-    fi
-
-    local current_version_file="${APP_DIR}/current.version"
-    if [ -f "${current_version_file}" ]; then
-        local current_version
-        current_version="$(tr -d '[:space:]' < "${current_version_file}")"
-        if [ -n "${current_version}" ] && [ -d "${APP_DIR}/versions/${current_version}" ]; then
-            find "${APP_DIR}/versions/${current_version}" -maxdepth 1 -type f -name "*.apk" | sort | head -n 1
-            return 0
-        fi
-    fi
-
-    find "${APP_DIR}/versions" -mindepth 2 -maxdepth 2 -type f -name "*.apk" | sort | tail -n 1
-}
-
 download_apk_if_needed() {
-    local resolved_apk_path="$1"
-    if [ -n "${resolved_apk_path}" ] && [ -f "${resolved_apk_path}" ]; then
-        echo "${resolved_apk_path}"
+    if [ -f "${APK_PATH}" ]; then
+        echo "${APK_PATH}"
         return 0
     fi
 
@@ -88,21 +44,11 @@ download_apk_if_needed() {
         return 1
     fi
 
-    local target_version="${APP_VERSION}"
-    if [ -z "${target_version}" ] || [ "${target_version}" = "latest" ]; then
-        target_version="$(date +%Y%m%d-%H%M%S)"
-    fi
-
-    local target_dir="${APP_DIR}/versions/${target_version}"
-    local target_file="${target_dir}/smobilpay-${target_version}.apk"
-
-    mkdir -p "${target_dir}"
-    echo "APK not found locally. Downloading ${APK_URL} into ${target_file}..."
-    curl -L -o "${target_file}" "${APK_URL}"
-    chmod 644 "${target_file}"
-    printf '%s\n' "${target_version}" > "${APP_DIR}/current.version"
-
-    echo "${target_file}"
+    mkdir -p "$(dirname "${APK_PATH}")"
+    echo "APK not found locally. Downloading ${APK_URL} into ${APK_PATH}..."
+    curl -L -o "${APK_PATH}" "${APK_URL}"
+    chmod 644 "${APK_PATH}"
+    echo "${APK_PATH}"
 }
 
 collect_test_files() {
@@ -137,7 +83,6 @@ collect_test_files() {
 
 echo "Starting Maestro Test Runner Script..."
 echo "Requested suite: ${TEST_SUITE}"
-echo "Requested app version: ${APP_VERSION}"
 
 adb connect "${DEVICE}"
 sleep 2
@@ -149,17 +94,14 @@ while [ "$(adb -s "${DEVICE}" shell getprop sys.boot_completed | tr -d '\r')" !=
 done
 echo "Device is ready."
 
-mkdir -p "${APP_DIR}/versions" "${ALLURE_RESULTS_PATH}" "${JUNIT_RESULTS_PATH}"
+mkdir -p "${APP_DIR}" "${ALLURE_RESULTS_PATH}" "${JUNIT_RESULTS_PATH}"
 
-APK_PATH="$(resolve_apk_path)"
-if ! APK_PATH="$(download_apk_if_needed "${APK_PATH}")"; then
-    echo "[ERROR] No APK found for APP_VERSION=${APP_VERSION}, and APK_URL was not provided."
+if ! APK_PATH="$(download_apk_if_needed)"; then
+    echo "[ERROR] No APK found at ${APK_PATH}, and APK_URL was not provided."
     exit 1
 fi
-APP_VERSION="$(resolve_app_version "${APK_PATH}")"
 
 echo "Using APK: ${APK_PATH}"
-echo "Resolved app version: ${APP_VERSION}"
 
 echo "Installing selected APK..."
 adb -s "${DEVICE}" uninstall "${APP_PACKAGE}" >/dev/null 2>&1 || true
@@ -176,7 +118,6 @@ cat <<EOF > "${ALLURE_RESULTS_PATH}/environment.properties"
 Device=${DEVICE}
 AppId=${APP_PACKAGE}
 Suite=${TEST_SUITE}
-AppVersion=${APP_VERSION}
 Environment=Development/WSL
 EOF
 cat <<EOF > "${ALLURE_RESULTS_PATH}/categories.json"
@@ -232,7 +173,7 @@ for test_file in "${TEST_FILES[@]}"; do
         maestro_args+=(--verbose)
     fi
 
-    test_args=(test "${test_file}" --env GLOBAL_TIMEOUT="${GLOBAL_TIMEOUT:-30000}")
+    test_args=(test "${test_file}")
     if [ -n "${MAESTRO_DEBUG_OUTPUT_DIR}" ]; then
         mkdir -p "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" || true
         test_args+=(--debug-output "${MAESTRO_DEBUG_OUTPUT_DIR}/${test_name}" --flatten-debug-output)

@@ -10,29 +10,13 @@ onFlowStart:
 ---
 # This part runs AFTER the onFlowStart finishes successfully
 - extendedWaitUntil:
-    visible:
-      id: "android:id/button1"
-    timeout: 60000
-- tapOn:
-    id: "android:id/button1"
-- tapOn:
-    id: "DeviceStatusGrantedButton"
-- tapOn:
-    id: "LoginFormPassword"
-- inputText: ${output.users.validUser.password}
-- back
-- tapOn:
-    id: "LoginFormLogin"
-- extendedWaitUntil:
-    visible: "Welcome to Smobilpay "
-    timeout: 60000
-- scroll
+    visible: "Skip"
+    timeout: ${output.config.extendedTimeout}
 - tapOn: "Skip"
-- extendedWaitUntil:
-    visible: "Favourite Services"
-    timeout: 200000
 - runFlow:
     when:
-      visible: "Important message."
+      visible: "Enable PIN Login?"
     commands:
-        - tapOn: 'AppUpdateDialogNotNow'
+        - tapOn:
+            id: "button-text"
+            index: 1

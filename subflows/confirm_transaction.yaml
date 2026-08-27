@@ -4,13 +4,13 @@ appId: com.smobilpayagentapp
 ---
 - extendedWaitUntil:
     visible: "Transaction Details"
-    timeout: ${GLOBAL_TIMEOUT}
+    timeout: ${output.config.longTimeout}
 - scroll
 - tapOn:
     id: "CollectionPreviewConfirmButton"
 - extendedWaitUntil:
     visible: "Collection Details"
-    timeout: ${GLOBAL_TIMEOUT}
+    timeout: ${output.config.longTimeout}
 - extendedWaitUntil:
     visible: "Success"
-    timeout: 60000
+    timeout: ${output.config.extendedTimeout}

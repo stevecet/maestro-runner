@@ -8,4 +8,6 @@ appId: com.smobilpayagentapp
     env:
       username: "${output.users.wrongUsernameUser.username}"
       password: "${output.users.wrongUsernameUser.password}"
-- assertVisible: "${output.strings.wrongUsernameText}"
+- extendedWaitUntil:
+    visible: "${output.strings.wrongUsernameText}"
+    timeout: ${output.config.extendedTimeout}

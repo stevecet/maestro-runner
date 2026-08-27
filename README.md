@@ -6,17 +6,14 @@ This project provides a Dockerized Maestro setup for Android UI automation with 
 - reusable flows in `subflows/`
 - test data in `data/`
 - suite definitions in `config/suites/`
-- versioned APKs in `app/versions/`
+- the APK under `app/smobilpay.apk`
 
 ## Recommended Structure
 
 ```text
 .
 |-- app/
-|   |-- current.version
-|   `-- versions/
-|       `-- 1.14.0/
-|           `-- smobilpay-1.14.0.apk
+|   `-- smobilpay.apk
 |-- config/
 |   `-- suites/
 |       |-- smoke.txt
@@ -30,22 +27,15 @@ This project provides a Dockerized Maestro setup for Android UI automation with 
 
 The suite files list folders or individual test files. This lets us group cases into smoke, regression, payments, or any future business suite without moving your current Maestro flows.
 
-## App Versioning
+## App APK
 
-Instead of replacing `app/smobilpay.apk` every time, APKs are now stored by version:
+The APK is not committed to Git. Download the app build used for testing:
 
 ```bash
-make download-apk APP_VERSION=1.14.0 APK_URL=https://your-link/app.apk
-make list-apps
+make download-apk APK_URL=https://your-link/app.apk
 ```
 
-That creates:
-
-```text
-app/versions/1.14.0/smobilpay-1.14.0.apk
-```
-
-The selected version is tracked in `app/current.version`, so regression on an older build becomes easier.
+This stores the APK at `app/smobilpay.apk`. Running the test commands also downloads it automatically when it is missing and `APK_URL` is available.
 
 ## Running Tests
 
@@ -76,7 +66,7 @@ make test-docker MAESTRO_DEBUG_OUTPUT_DIR=maestro-debug
 Run a specific suite:
 
 ```bash
-make test-docker TEST_SUITE=smoke APP_VERSION=1.14.0
+make test-docker TEST_SUITE=smoke
 ```
 
 Run a specific folder or a single test file:
@@ -93,20 +83,19 @@ make test-docker TEST_PATH=tests/00_login/successful_login.yaml
 
 ## Jenkins Workspace Permissions
 
-If Jenkins fails during `checkout scm` with errors like `Permission denied` for `app/current.version` or `app/versions`, it usually means a previous Docker run wrote root-owned files into the workspace.
+If Jenkins fails during `checkout scm` with permission errors under `app/`, it usually means a previous Docker run wrote root-owned files into the workspace.
 
 This repo configures the `maestro-runner` container to run as the Jenkins agent user (`DOCKER_UID/DOCKER_GID`) and mounts the repository read-only to prevent future permission drift.
 
 ## Jenkins
 
-The pipeline now accepts:
+The pipeline accepts:
 
-- `APP_VERSION`
 - `TEST_SUITE`
 - `TEST_PATH`
 - `APK_URL`
 
-This means Jenkins can run smoke on the latest app, or regression on a stored historical version, without changing files in the repository.
+Jenkins uses `app/smobilpay.apk` when present, or downloads it from `APK_URL`.
 
 ## Team Guidance
 
@@ -116,7 +105,7 @@ For future growth, keep using this convention:
 - keep reusable sequences in `subflows/`
 - keep static or generated test data in `data/`
 - define business-friendly groupings in `config/suites/*.txt`
-- store APKs by version under `app/versions/<version>/`
+- replace `app/smobilpay.apk` when switching to a different app build
 
 ## Cleanup
 

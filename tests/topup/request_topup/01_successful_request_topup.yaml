@@ -9,7 +9,7 @@ onFlowStart:
 - tapOn: "Proceed"
 - extendedWaitUntil:
     visible: "${output.request_topup_data.selectBankText}"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - assertVisible: "${output.request_topup_data.selectBankText}"
 - assertVisible: "${output.request_topup_data.selectAccountPlaceholderText}"
 - assertVisible:
@@ -30,9 +30,12 @@ onFlowStart:
 - inputText: "${output.request_topup_data.validAmount}"
 - back
 - tapOn: "${output.request_topup_data.selectBankText}"
-- tapOn: "${output.request_topup_data.bankName}"
+- tapOn:
+    id: "menu-item"
+    index: 1
 - tapOn: "${output.request_topup_data.selectAccountPlaceholderText}"
-- tapOn: "${output.request_topup_data.accountNumber}"
+- tapOn:
+    id: "menu-view"
 - scroll
 
 # Motif/reference is required before proceeding
@@ -54,7 +57,7 @@ onFlowStart:
 - tapOn: "${output.request_topup_data.proceedText}"
 - extendedWaitUntil:
     visible: "Top-up review"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - assertVisible: "${output.request_topup_data.reviewAmountText}"
 - assertVisible: "${output.request_topup_data.bankName}"
 - assertVisible: "${output.request_topup_data.accountNumber}"
@@ -62,4 +65,4 @@ onFlowStart:
 - tapOn: "Submit Top-up Request"
 - extendedWaitUntil:
     visible: "Top-up request submitted successfully"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}

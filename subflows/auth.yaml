@@ -1,18 +1,34 @@
 # subflows/auth.yaml
+# Initial flow of the app to be ran one fresh install
 appId: com.smobilpayagentapp
 ---
+- runScript: ../data/config.js
 - launchApp:
     clearState: true
 - tapOn:
     id: "GetStartedButton"
 - tapOn:
-    id: "InitialLoginFormUsername"
+    text: "Continue"
+    optional: true
+- repeat:
+    times: 3
+    commands:
+      - tapOn:
+          text: "Next"
+          optional: true
+- tapOn: 
+    text: "Secure My Profile"
+    optional: true
+- extendedWaitUntil:
+    visible: "Login"
+    timeout: ${output.config.shortTimeout}
+- tapOn:
+    id: "LoginFormUsername"
 - inputText: ${username}
 - hideKeyboard
 - tapOn:
-    id: "InitialLoginFormPassword"
+    id: "LoginFormPassword"
 - inputText: ${password}
 - hideKeyboard
-# Tapping the left side of the Login button at the bottom (70% height)
 - tapOn:
-    point: "20%,77%"
+    id: "LoginFormLogin"

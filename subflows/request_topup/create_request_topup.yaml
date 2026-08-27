@@ -7,7 +7,7 @@ appId: com.smobilpayagentapp
 - tapOn: "Proceed"
 - extendedWaitUntil:
     visible: "${output.request_topup_data.selectBankText}"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - tapOn:
     id: "text-input-outline"
 - inputText: ${output.request_topup_data.validAmount}
@@ -29,8 +29,8 @@ appId: com.smobilpayagentapp
 - tapOn: "Proceed"
 - extendedWaitUntil:
     visible: "Top-up review"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - tapOn: "Submit Top-up Request"
 - extendedWaitUntil:
     visible: "Top-up request submitted successfully"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}

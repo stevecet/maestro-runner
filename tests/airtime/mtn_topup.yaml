@@ -18,7 +18,7 @@ onFlowStart:
 ## verify transaction details before confirming
 - extendedWaitUntil:
     visible: "Transaction Details"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - scroll
 - assertVisible: "Customer ID"
 - assertVisible: "${output.topup_data.mtnServiceNumber}"

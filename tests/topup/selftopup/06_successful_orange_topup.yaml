@@ -8,7 +8,7 @@ onFlowStart:
 - tapOn: "Self top-up"
 - extendedWaitUntil:
     visible: "Self top-up"
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - tapOn:
     id: "text-input-outline"
 - inputText: ${output.selftopup_data.topupAmount}
@@ -19,7 +19,7 @@ onFlowStart:
     id: "button"
 - extendedWaitUntil:
     visible: ${output.selftopup_data.orangeTitleText}
-    timeout: 10000
+    timeout: ${output.config.shortTimeout}
 - assertVisible: "${output.selftopup_data.amountText}"
 - assertVisible: "${output.selftopup_data.displayedAmount} XAF"
 - assertVisible: "${output.selftopup_data.serviceFeeText}"
@@ -31,7 +31,7 @@ onFlowStart:
     id: "AccountTopUpPreviewSubmitButton" 
 - extendedWaitUntil:
     visible: "Collection Details"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 - extendedWaitUntil:
     visible: "Success"
-    timeout: 30000
+    timeout: ${output.config.longTimeout}

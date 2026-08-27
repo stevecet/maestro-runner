@@ -1,6 +1,6 @@
 // data/cashout_data.js
 const cashout_data = {
-  orangeServiceNumber: "690935868",
+  orangeServiceNumber: "697009900",
   mtnServiceNumber: "650134682",
   cashoutAmount: "1000",
   transactionDetails: "Transaction Details",
@@ -12,7 +12,7 @@ const cashout_data = {
   mtnTotalAmount: "1,000.00",
   orangeTotalAmount: "1,100.00",
   searchOrangeCashout: "Orange money cash - out",
-  searchMTNCashout: "MTN momo Cashout",
+  searchMTNCashout: "MTN momo Cash out",
   amountText: "Amount",
   serviceFeeText: "Service Fee",
   totalText: "Total",

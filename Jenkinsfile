@@ -13,17 +13,16 @@ pipeline {
     }
 
     parameters {
-        string(name: 'APP_VERSION', defaultValue: 'latest', description: 'APK version folder from app/versions to install before tests')
         choice(name: 'TEST_SUITE', choices: ['regression', 'smoke'], description: 'Suite manifest to execute')
         string(name: 'TEST_PATH', defaultValue: '', description: 'Optional test file or folder override. Leave empty to use TEST_SUITE.')
-        string(name: 'APK_URL', defaultValue: 'https://expo.dev/artifacts/eas/czMwkPWpEviGGfVSv9XCka.apk', description: 'Optional APK URL used when the selected version is not stored locally')
+        string(name: 'APK_URL', defaultValue: 'https://expo.dev/artifacts/eas/a_SbXg_Oq_iLv9mZFdCKroUcMq23onlkT4A-uGL3wrM.apk', description: 'APK URL used when app/smobilpay.apk is not available')
     }
 
     stages {
         stage('Workspace Permissions') {
             steps {
                 script {
-                    // Previous docker runs can leave root-owned artifacts in the workspace (e.g. app/current.version),
+                    // Previous docker runs can leave root-owned artifacts in the workspace,
                     // which can break subsequent `checkout scm`.
                     def uid = sh(script: 'id -u', returnStdout: true).trim()
                     def gid = sh(script: 'id -g', returnStdout: true).trim()
@@ -58,7 +57,6 @@ pipeline {
                     def gid = sh(script: 'id -g', returnStdout: true).trim()
                     sh(script: "rm -rf ${env.ALLURE_RESULTS_PATH} ${env.JUNIT_RESULTS_PATH} && mkdir -p ${env.ALLURE_RESULTS_PATH} ${env.JUNIT_RESULTS_PATH}")
                     def runnerEnv = [
-                        "APP_VERSION=${params.APP_VERSION}",
                         "TEST_SUITE=${params.TEST_SUITE}",
                         "TEST_PATH=${params.TEST_PATH}",
                         "APK_URL=${params.APK_URL}",

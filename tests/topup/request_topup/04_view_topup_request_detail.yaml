@@ -8,12 +8,12 @@ onFlowStart:
 - tapOn: "Topup Request History"
 - extendedWaitUntil:
     visible: "${output.request_topup_data.historyTitle}"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 
 - tapOn: "${output.request_topup_data.bankName}"
 - extendedWaitUntil:
     visible: "${output.request_topup_data.detailTitle}"
-    timeout: 20000
+    timeout: ${output.config.mediumTimeout}
 
 - assertVisible: "${output.request_topup_data.reviewedBannerText}"
 - assertVisible: "Status"
